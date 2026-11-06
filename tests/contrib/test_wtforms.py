@@ -66,3 +66,12 @@ def test_without_data_required_an_empty_field_is_not_validated() -> None:
 
     assert OptionalForm(PostData(dpi="")).validate()
     assert OptionalForm(PostData()).validate()
+
+
+def test_canonical_keeps_panama_hyphens() -> None:
+    class PanamaForm(Form):
+        cedula = StringField("Cédula", validators=[Document("pa.cedula", normalize="canonical")])
+
+    form = PanamaForm(PostData(cedula="1 12 345"))
+    assert form.validate()
+    assert form.cedula.data == "1-12-345"

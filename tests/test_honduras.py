@@ -16,6 +16,24 @@ def test_formats_and_compacts() -> None:
     assert doc.compact("0801-1990-12345") == "0801199012345"
 
 
+# Municipalities per department, copied by hand from the INE municipal volumes (2013 census),
+# not from the package: a typo in the package table that keeps the total at 298 still fails.
+INE_MUNICIPALITIES = {
+    1: 8, 2: 10, 3: 21, 4: 23, 5: 12, 6: 16, 7: 19, 8: 28, 9: 6,
+    10: 17, 11: 4, 12: 19, 13: 28, 14: 16, 15: 23, 16: 28, 17: 9, 18: 11,
+}  # fmt: skip
+
+
+def test_table_matches_the_ine_counts() -> None:
+    assert dict(MUNICIPALITIES_BY_DEPARTMENT) == INE_MUNICIPALITIES
+    doc = Identidad()
+    for department, count in INE_MUNICIPALITIES.items():
+        assert doc.is_valid(f"{department:02d}{count:02d}199012345")
+        assert doc.validate(f"{department:02d}{count + 1:02d}199012345").error is (
+            ErrorCode.COMPONENT
+        )
+
+
 def test_298_municipalities_in_18_departments() -> None:
     assert len(MUNICIPALITIES_BY_DEPARTMENT) == 18
     assert sum(MUNICIPALITIES_BY_DEPARTMENT.values()) == 298

@@ -5,6 +5,7 @@ from __future__ import annotations
 import difflib
 import functools
 import re
+import string
 import threading
 from collections.abc import Mapping
 from types import MappingProxyType
@@ -22,6 +23,8 @@ from stdnum_centroamerica._types import (
 from stdnum_centroamerica.exceptions import UnknownDocumentError, UnsupportedOperationError
 
 __all__ = [
+    "canonical",
+    "canonical_form",
     "describe",
     "generate",
     "is_valid",
@@ -45,7 +48,7 @@ _CATALOG: Mapping[str, DocumentInfo] = MappingProxyType(
             DocumentInfo("sv.nrc", sv.Nrc, "SV", "NRC", _F),
             DocumentInfo("hn.identidad", hn.Identidad, "HN", "Número de identidad", _F),
             DocumentInfo("hn.rtn", hn.Rtn, "HN", "RTN", _F),
-            DocumentInfo("ni.cedula", ni.Cedula, "NI", "Cédula", _C),
+            DocumentInfo("ni.cedula", ni.Cedula, "NI", "Cédula", _F),  # the letter is opt-in
             DocumentInfo("ni.ruc", ni.Ruc, "NI", "RUC", _F),
             DocumentInfo("cr.cedula_fisica", cr.CedulaFisica, "CR", "Cédula física", _F),
             DocumentInfo("cr.cedula_juridica", cr.CedulaJuridica, "CR", "Cédula jurídica", _F),
@@ -61,8 +64,31 @@ _CATALOG: Mapping[str, DocumentInfo] = MappingProxyType(
 )
 
 _KEY = re.compile(r"[a-z0-9]+\.[a-z0-9_]+", re.ASCII)
+_MAX_KEY_LENGTH = 64
+_DOCUMENT_CHARS = frozenset(string.ascii_lowercase + string.digits + "_")
 _custom: dict[str, type[Document]] = {}
 _lock = threading.Lock()
+
+
+def _is_echoable(key: str) -> bool:
+    """Return ``True`` if the key is safe to repeat in an error message.
+
+    Letters, a dot, then a letter followed by letters, digits or ``_`` (``gt.dpx``).
+    ``12345678.9`` would be a valid :func:`register` key, but it may be a document number
+    passed by mistake, so it is not repeated. Plain character checks, no regex: the key is
+    user input.
+    """
+    if len(key) > _MAX_KEY_LENGTH:
+        return False
+    country, dot, document = key.partition(".")
+    return (
+        dot == "."
+        and country != ""
+        and all(char in string.ascii_lowercase for char in country)
+        and document != ""
+        and document[0] in string.ascii_lowercase
+        and all(char in _DOCUMENT_CHARS for char in document)
+    )
 
 
 def _resolve(key: str) -> type[Document]:
@@ -77,6 +103,12 @@ def _resolve(key: str) -> type[Document]:
     info = _CATALOG.get(normalized)
     if info is not None:
         return info.document_class
+
+    if not _is_echoable(normalized):
+        # Not shaped like a key: it may be a document number passed by mistake (arguments
+        # swapped), which is personal data, so it is not echoed.
+        message = "Unsupported document key (not shown: it does not look like 'country.document')"
+        raise UnknownDocumentError(message)
 
     message = f"Unsupported document: {normalized!r}"
     suggestions = difflib.get_close_matches(normalized, keys(), n=3)
@@ -147,9 +179,31 @@ def parse(key: str, number: str, /, **options: Any) -> Any:
     return document.parse(number)
 
 
+def canonical_form(document: Document, number: str) -> str:
+    """Return ``document.canonical(number)``, or the compact form if the class lacks it.
+
+    Registered classes only have to implement :class:`Document`, which has no ``canonical``.
+    """
+    method = getattr(document, "canonical", None)
+    if callable(method):
+        return str(method(number))
+    return document.compact(number)
+
+
+def canonical(key: str, number: str, /, **options: Any) -> str:
+    """Return the form to store: two different numbers never share it, and variants of the same
+    number (separators, case, leading zeros where they carry no meaning) do.
+
+    It is the compact form, except in Panama, where the hyphens are part of the number. Like
+    :meth:`Document.compact`, it does not validate: call it on valid numbers.
+    """
+    return canonical_form(make(key, **options), number)
+
+
 def keys() -> tuple[str, ...]:
     """Return the available keys: first those added with :func:`register`, then bundled ones."""
-    custom = tuple(_custom)
+    with _lock:
+        custom = tuple(_custom)
     return custom + tuple(key for key in _CATALOG if key not in _custom)
 
 
@@ -161,13 +215,18 @@ def describe() -> tuple[DocumentInfo, ...]:
 def register(key: str, document_class: type[Document]) -> None:
     """Add or replace a document; it takes precedence over the bundled ones.
 
-    Call it at application startup, not per request.
+    Call it at application startup, not per request. Replacing a bundled key (``gt.dpi``)
+    changes validation for the whole process, including other libraries that use it.
 
     :raises ValueError: if the key does not look like ``country.document``.
     :raises TypeError: if the class does not implement the :class:`Document` protocol.
     """
     raw_key: object = key
-    if not isinstance(raw_key, str) or _KEY.fullmatch(raw_key.lower()) is None:
+    if (
+        not isinstance(raw_key, str)
+        or len(raw_key) > _MAX_KEY_LENGTH
+        or _KEY.fullmatch(raw_key.lower()) is None
+    ):
         message = "key must look like 'country.document' (a-z, 0-9 and _)"
         raise ValueError(message)
     candidate: object = document_class

@@ -9,7 +9,8 @@ Usage::
         dpi = StringField("DPI", validators=[DataRequired(), Document("gt.dpi")])
 
 Empty fields are not validated: combine it with ``DataRequired`` or ``Optional``. With
-``normalize="compact"`` or ``"format"``, ``field.data`` is normalized after validation.
+``normalize="canonical"``, ``"compact"`` or ``"format"``, ``field.data`` is normalized after
+validation.
 """
 
 from __future__ import annotations
@@ -41,8 +42,9 @@ class Document:
 
     :param key: document key, e.g. ``"gt.dpi"``.
     :param message: a single message for any error (otherwise, one per ``ErrorCode``).
-    :param normalize: ``"none"`` (default, leaves ``field.data`` unchanged), ``"compact"``
-        or ``"format"``.
+    :param normalize: ``"none"`` (default, leaves ``field.data`` unchanged),
+        ``"canonical"`` (the form to store; keeps Panama's hyphens), ``"compact"`` or
+        ``"format"``.
     :param messages: messages per ``ErrorCode``.
     :param options: document options.
     """

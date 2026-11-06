@@ -116,6 +116,8 @@ def test_register_replaces_a_document_and_requires_the_protocol() -> None:
         sca.register("xx.mal", Nite())  # type: ignore[arg-type]
     with pytest.raises(ValueError, match=r"country\.document"):
         sca.register("sin_punto", Nite)
+    with pytest.raises(ValueError, match=r"country\.document"):
+        sca.register("xx." + "a" * 100, Nite)
 
 
 def test_version() -> None:

@@ -13,7 +13,7 @@ from django.conf import settings
 
 if not settings.configured:
     settings.configure(
-        DEBUG=True,
+        DEBUG=True,  # example only: debug pages show the submitted data, which is personal
         SECRET_KEY="example-only",  # noqa: S106 - in production, read it from the environment
         ROOT_URLCONF=__name__,
         ALLOWED_HOSTS=["localhost", "127.0.0.1", "testserver"],
@@ -46,7 +46,7 @@ DPI_VALIDATOR = DocumentValidator("gt.dpi")
 
 class CustomerForm(forms.Form):
     name = forms.CharField(max_length=100)
-    dpi = DocumentFormField("gt.dpi")  # cleaned_data["dpi"] is compact
+    dpi = DocumentFormField("gt.dpi")  # cleaned_data["dpi"] is the canonical form (compact)
     cedula_ni = DocumentFormField(
         "ni.cedula", normalize="format", document_options={"strict_letter": True}, required=False
     )

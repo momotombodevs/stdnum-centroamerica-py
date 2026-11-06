@@ -9,7 +9,7 @@ Usage::
     Dpi = Annotated[str, Document("gt.dpi")]
 
     class Customer(BaseModel):
-        dpi: Dpi                                                     # stored compact
+        dpi: Dpi                                                     # canonical form
         cedula: Annotated[str, Document("ni.cedula", normalize="format", strict_letter=True)]
 
 An invalid number raises a Pydantic ``ValidationError`` of type ``stdnum_format``,
@@ -45,7 +45,8 @@ class Document:
     """``Annotated[str, ...]`` metadata that validates and normalizes a document.
 
     :param key: document key, e.g. ``"gt.dpi"``.
-    :param normalize: ``"compact"`` (default), ``"format"`` or ``"none"``.
+    :param normalize: ``"canonical"`` (default: the form to store, compact except for
+        Panama), ``"compact"``, ``"format"`` or ``"none"``.
     :param messages: messages per ``ErrorCode``, to translate or customize them.
     :param options: document options, e.g. ``strict_letter=True``.
     """
@@ -56,7 +57,7 @@ class Document:
         self,
         key: str,
         *,
-        normalize: Normalize = "compact",
+        normalize: Normalize = "canonical",
         messages: Mapping[ErrorCode, str] | None = None,
         **options: Any,
     ) -> None:
