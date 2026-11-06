@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import re
 import time
 
 import pytest
@@ -261,3 +262,30 @@ def test_canonical_never_merges_different_numbers() -> None:
     numbers = ["1-12-345", "11-2-345", "1-1-2345", "PE-1-12", "N-1-12", "E-1-12", "1-PI-1-12"]
     assert all(sca.is_valid("pa.cedula", number) for number in numbers)
     assert len({sca.canonical("pa.cedula", number) for number in numbers}) == len(numbers)
+
+
+@pytest.mark.parametrize(
+    "key",
+    ["gt.dpx", "xx.nite_2", "abc.d"],
+)
+def test_key_shaped_keys_are_echoed(key: str) -> None:
+    with pytest.raises(sca.UnknownDocumentError, match=re.escape(repr(key))):
+        sca.make(key)
+
+
+@pytest.mark.parametrize(
+    "key",
+    ["gt.", ".dpi", "gt", "g1.dpi", "gt.1dpi", "gt.dp-i", "gt.d.pi", "gt.dpí", "a" * 60 + ".dpi1"],
+)
+def test_keys_not_shaped_like_keys_are_not_echoed(key: str) -> None:
+    with pytest.raises(sca.UnknownDocumentError) as error:
+        sca.make(key)
+    assert key not in str(error.value)
+
+
+def test_unknown_key_check_is_fast_on_long_repetitive_input() -> None:
+    start = time.perf_counter()
+    for key in ("a" * 100_000, "a." + "a" * 100_000, "a" * 50_000 + "." + "!" * 50_000):
+        with pytest.raises(sca.UnknownDocumentError):
+            sca.make(key)
+    assert time.perf_counter() - start < 1

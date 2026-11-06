@@ -5,6 +5,7 @@ from __future__ import annotations
 import difflib
 import functools
 import re
+import string
 import threading
 from collections.abc import Mapping
 from types import MappingProxyType
@@ -63,11 +64,31 @@ _CATALOG: Mapping[str, DocumentInfo] = MappingProxyType(
 )
 
 _KEY = re.compile(r"[a-z0-9]+\.[a-z0-9_]+", re.ASCII)
-_ECHOABLE_KEY = re.compile(r"[a-z]+\.[a-z][a-z0-9_]*", re.ASCII)
-"""Keys safe to repeat in an error: ``12345678.9`` matches ``_KEY`` but may be a number."""
 _MAX_KEY_LENGTH = 64
+_DOCUMENT_CHARS = frozenset(string.ascii_lowercase + string.digits + "_")
 _custom: dict[str, type[Document]] = {}
 _lock = threading.Lock()
+
+
+def _is_echoable(key: str) -> bool:
+    """Return ``True`` if the key is safe to repeat in an error message.
+
+    Letters, a dot, then a letter followed by letters, digits or ``_`` (``gt.dpx``).
+    ``12345678.9`` would be a valid :func:`register` key, but it may be a document number
+    passed by mistake, so it is not repeated. Plain character checks, no regex: the key is
+    user input.
+    """
+    if len(key) > _MAX_KEY_LENGTH:
+        return False
+    country, dot, document = key.partition(".")
+    return (
+        dot == "."
+        and country != ""
+        and all(char in string.ascii_lowercase for char in country)
+        and document != ""
+        and document[0] in string.ascii_lowercase
+        and all(char in _DOCUMENT_CHARS for char in document)
+    )
 
 
 def _resolve(key: str) -> type[Document]:
@@ -83,7 +104,7 @@ def _resolve(key: str) -> type[Document]:
     if info is not None:
         return info.document_class
 
-    if len(normalized) > _MAX_KEY_LENGTH or _ECHOABLE_KEY.fullmatch(normalized) is None:
+    if not _is_echoable(normalized):
         # Not shaped like a key: it may be a document number passed by mistake (arguments
         # swapped), which is personal data, so it is not echoed.
         message = "Unsupported document key (not shown: it does not look like 'country.document')"
