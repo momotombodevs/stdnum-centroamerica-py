@@ -1,0 +1,899 @@
+{
+  "documents": {
+    "gt.nit": {
+      "valid": [
+        {
+          "id": "1234567-9",
+          "number": "1234567-9"
+        },
+        {
+          "id": "123456789",
+          "number": "123456789"
+        },
+        {
+          "id": "3602978-5",
+          "number": "3602978-5"
+        },
+        {
+          "id": "12345678-9",
+          "number": "12345678-9"
+        }
+      ],
+      "invalid": [
+        {
+          "id": "1234567-8",
+          "number": "1234567-8"
+        },
+        {
+          "id": "1234567",
+          "number": "1234567"
+        },
+        {
+          "id": "ABC",
+          "number": "ABC"
+        },
+        {
+          "id": "",
+          "number": ""
+        }
+      ],
+      "formats": [
+        {
+          "input": "12345679",
+          "expected": "1234567-9"
+        }
+      ]
+    },
+    "gt.dpi": {
+      "valid": [
+        {
+          "id": "1234567890101",
+          "number": "1234567890101"
+        },
+        {
+          "id": "1234 56789 0101",
+          "number": "1234 56789 0101"
+        }
+      ],
+      "invalid": [
+        {
+          "id": "1234567880101",
+          "number": "1234567880101"
+        },
+        {
+          "id": "1234567890001",
+          "number": "1234567890001"
+        },
+        {
+          "id": "1234567892301",
+          "number": "1234567892301"
+        },
+        {
+          "id": "123",
+          "number": "123"
+        }
+      ],
+      "formats": [
+        {
+          "input": "1234567890101",
+          "expected": "1234 56789 0101"
+        }
+      ]
+    },
+    "sv.dui": {
+      "valid": [
+        {
+          "id": "12345678-4",
+          "number": "12345678-4"
+        },
+        {
+          "id": "123456784",
+          "number": "123456784"
+        }
+      ],
+      "invalid": [
+        {
+          "id": "12345678-5",
+          "number": "12345678-5"
+        },
+        {
+          "id": "1234567",
+          "number": "1234567"
+        },
+        {
+          "id": "ABCDEFGH-4",
+          "number": "ABCDEFGH-4"
+        }
+      ],
+      "formats": [
+        {
+          "input": "123456784",
+          "expected": "12345678-4"
+        }
+      ]
+    },
+    "sv.nit": {
+      "valid": [
+        {
+          "id": "DGII sequence 136",
+          "number": "0614-130386-136-4"
+        },
+        {
+          "id": "DGII sequence 001",
+          "number": "0716-200261-001-4"
+        },
+        {
+          "id": "DGII sequence 002",
+          "number": "0511-130963-002-1"
+        },
+        {
+          "id": "without hyphens",
+          "number": "06141303861364"
+        },
+        {
+          "id": "DUI as NIT (9 digits)",
+          "number": "12345678-4"
+        }
+      ],
+      "invalid": [
+        {
+          "id": "wrong check digit",
+          "number": "0614-130386-136-5"
+        },
+        {
+          "id": "wrong check digit, legacy formula",
+          "number": "0716-200261-001-5"
+        },
+        {
+          "id": "placeholder from the guide",
+          "number": "10101010101010"
+        },
+        {
+          "id": "DUI with wrong check digit",
+          "number": "12345678-5"
+        },
+        {
+          "id": "too short",
+          "number": "0614-130386-136"
+        },
+        {
+          "id": "letters",
+          "number": "0614-130386-136-A"
+        },
+        {
+          "id": "empty",
+          "number": ""
+        }
+      ],
+      "formats": [
+        {
+          "input": "06141303861364",
+          "expected": "0614-130386-136-4"
+        },
+        {
+          "input": "123456784",
+          "expected": "12345678-4"
+        }
+      ]
+    },
+    "sv.nrc": {
+      "valid": [
+        {
+          "id": "123456-7",
+          "number": "123456-7"
+        },
+        {
+          "id": "1234567",
+          "number": "1234567"
+        },
+        {
+          "id": "01234567",
+          "number": "01234567"
+        },
+        {
+          "id": "1",
+          "number": "1"
+        },
+        {
+          "id": "12345678",
+          "number": "12345678"
+        }
+      ],
+      "invalid": [
+        {
+          "id": "123456789",
+          "number": "123456789"
+        },
+        {
+          "id": "12A456",
+          "number": "12A456"
+        },
+        {
+          "id": "ABC",
+          "number": "ABC"
+        },
+        {
+          "id": "",
+          "number": ""
+        }
+      ],
+      "formats": [
+        {
+          "input": "1234567",
+          "expected": "123456-7"
+        }
+      ]
+    },
+    "hn.identidad": {
+      "valid": [
+        {
+          "id": "0801-1990-12345",
+          "number": "0801-1990-12345"
+        },
+        {
+          "id": "0801199012345",
+          "number": "0801199012345"
+        },
+        {
+          "id": "La Ceiba",
+          "number": "0101-1985-00001"
+        },
+        {
+          "id": "last municipality of Francisco Morazán",
+          "number": "0828-2000-00001"
+        },
+        {
+          "id": "Villeda Morales, Gracias a Dios (INE 09-06)",
+          "number": "0906-1990-00001"
+        },
+        {
+          "id": "San Francisco de Opalaca, Intibucá (INE 10-17)",
+          "number": "1017-1990-00001"
+        },
+        {
+          "id": "dual nationality",
+          "number": "0880-2015-00001"
+        },
+        {
+          "id": "naturalized",
+          "number": "0890-2010-00012"
+        }
+      ],
+      "invalid": [
+        {
+          "id": "department 00",
+          "number": "0001-1990-12345"
+        },
+        {
+          "id": "department 19",
+          "number": "1901-1990-12345"
+        },
+        {
+          "id": "municipality 00",
+          "number": "0800-1990-12345"
+        },
+        {
+          "id": "municipality 29 of Francisco Morazán",
+          "number": "0829-1990-12345"
+        },
+        {
+          "id": "Gracias a Dios has only 6",
+          "number": "0907-1990-00001"
+        },
+        {
+          "id": "Intibucá has only 17",
+          "number": "1018-1990-00001"
+        },
+        {
+          "id": "code 0881 is not special",
+          "number": "0881-1990-12345"
+        },
+        {
+          "id": "future year",
+          "number": "0801-2999-12345"
+        },
+        {
+          "id": "year 1700",
+          "number": "0801-1700-12345"
+        },
+        {
+          "id": "too short",
+          "number": "0801-1990-1234"
+        },
+        {
+          "id": "letters",
+          "number": "0801-1990-1234A"
+        }
+      ],
+      "formats": []
+    },
+    "hn.rtn": {
+      "valid": [
+        {
+          "id": "0801-1990-123456",
+          "number": "0801-1990-123456"
+        },
+        {
+          "id": "08011990123456",
+          "number": "08011990123456"
+        }
+      ],
+      "invalid": [
+        {
+          "id": "0801-1990-12345",
+          "number": "0801-1990-12345"
+        },
+        {
+          "id": "0801-1990-12345A",
+          "number": "0801-1990-12345A"
+        }
+      ],
+      "formats": [
+        {
+          "input": "0801-1990-123456",
+          "expected": "08011990123456"
+        }
+      ]
+    },
+    "ni.cedula": {
+      "valid": [
+        {
+          "id": "001-010190-0001N",
+          "number": "001-010190-0001N"
+        },
+        {
+          "id": "0010101900001n",
+          "number": "0010101900001n"
+        },
+        {
+          "id": "001-251075-0012S",
+          "number": "001-251075-0012S"
+        },
+        {
+          "id": "2811505850001R",
+          "number": "2811505850001R"
+        },
+        {
+          "id": "6010101900001X",
+          "number": "6010101900001X"
+        }
+      ],
+      "invalid": [
+        {
+          "id": "month 13",
+          "number": "001-011390-0001N"
+        },
+        {
+          "id": "day 32",
+          "number": "001-320190-0001N"
+        },
+        {
+          "id": "municipality 000",
+          "number": "000-010190-0001V"
+        },
+        {
+          "id": "municipality out of range",
+          "number": "641-010190-0001T"
+        },
+        {
+          "id": "without letter",
+          "number": "001-010190-0001"
+        },
+        {
+          "id": "too short",
+          "number": "123"
+        }
+      ],
+      "formats": []
+    },
+    "ni.ruc": {
+      "valid": [
+        {
+          "id": "J0310000000001",
+          "number": "J0310000000001"
+        },
+        {
+          "id": "N0010101900001",
+          "number": "N0010101900001"
+        },
+        {
+          "id": "001-010190-0001N",
+          "number": "001-010190-0001N"
+        },
+        {
+          "id": "DGI national without cédula",
+          "number": "N0000000000019"
+        },
+        {
+          "id": "DGI resident foreigner",
+          "number": "R1230003007661"
+        },
+        {
+          "id": "DGI non-resident foreigner",
+          "number": "E1230003007661"
+        },
+        {
+          "id": "DGI legal entity",
+          "number": "J0310000007669"
+        }
+      ],
+      "invalid": [
+        {
+          "id": "K0310000000001",
+          "number": "K0310000000001"
+        },
+        {
+          "id": "J031000000000",
+          "number": "J031000000000"
+        },
+        {
+          "id": "123",
+          "number": "123"
+        },
+        {
+          "id": "four leading zeros (DGI)",
+          "number": "0000300766011M"
+        }
+      ],
+      "formats": []
+    },
+    "cr.cedula_fisica": {
+      "valid": [
+        {
+          "id": "1-0123-0456",
+          "number": "1-0123-0456"
+        },
+        {
+          "id": "101230456",
+          "number": "101230456"
+        }
+      ],
+      "invalid": [
+        {
+          "id": "0-0123-0456",
+          "number": "0-0123-0456"
+        },
+        {
+          "id": "1-0123-045",
+          "number": "1-0123-045"
+        },
+        {
+          "id": "A-0123-0456",
+          "number": "A-0123-0456"
+        }
+      ],
+      "formats": [
+        {
+          "input": "101230456",
+          "expected": "1-0123-0456"
+        }
+      ]
+    },
+    "cr.cedula_juridica": {
+      "valid": [
+        {
+          "id": "3-101-123456",
+          "number": "3-101-123456"
+        },
+        {
+          "id": "3101123456",
+          "number": "3101123456"
+        },
+        {
+          "id": "no leading-zero rule",
+          "number": "0-101-123456"
+        }
+      ],
+      "invalid": [
+        {
+          "id": "3-101-12345",
+          "number": "3-101-12345"
+        },
+        {
+          "id": "3-101-1234567",
+          "number": "3-101-1234567"
+        },
+        {
+          "id": "3-101-12345A",
+          "number": "3-101-12345A"
+        }
+      ],
+      "formats": [
+        {
+          "input": "3101123456",
+          "expected": "3-101-123456"
+        }
+      ]
+    },
+    "cr.dimex": {
+      "valid": [
+        {
+          "id": "155812345678",
+          "number": "155812345678"
+        },
+        {
+          "id": "15581234567",
+          "number": "15581234567"
+        }
+      ],
+      "invalid": [
+        {
+          "id": "055812345678",
+          "number": "055812345678"
+        },
+        {
+          "id": "1558123456",
+          "number": "1558123456"
+        },
+        {
+          "id": "1558123456789",
+          "number": "1558123456789"
+        }
+      ],
+      "formats": [
+        {
+          "input": "155812345678",
+          "expected": "155812345678"
+        }
+      ]
+    },
+    "cr.nite": {
+      "valid": [
+        {
+          "id": "1234567890",
+          "number": "1234567890"
+        }
+      ],
+      "invalid": [
+        {
+          "id": "123456789",
+          "number": "123456789"
+        },
+        {
+          "id": "12345678901",
+          "number": "12345678901"
+        },
+        {
+          "id": "ABCDEFGHIJ",
+          "number": "ABCDEFGHIJ"
+        }
+      ],
+      "formats": [
+        {
+          "input": "1234567890",
+          "expected": "1234567890"
+        }
+      ]
+    },
+    "pa.cedula": {
+      "valid": [
+        {
+          "id": "birth",
+          "number": "8-926-1601"
+        },
+        {
+          "id": "born abroad",
+          "number": "PE-5-687"
+        },
+        {
+          "id": "naturalized",
+          "number": "N-19-473"
+        },
+        {
+          "id": "foreign resident",
+          "number": "E-8-12345"
+        },
+        {
+          "id": "province 1",
+          "number": "1-1-1"
+        },
+        {
+          "id": "province 9",
+          "number": "9-100-12345"
+        },
+        {
+          "id": "lowercase and spaces",
+          "number": "pe 5 687"
+        },
+        {
+          "id": "indigenous region",
+          "number": "12-12-345"
+        },
+        {
+          "id": "indigenous",
+          "number": "3-PI-12-345"
+        },
+        {
+          "id": "predates the civil registry",
+          "number": "8-AV-12-345"
+        }
+      ],
+      "invalid": [
+        {
+          "id": "province 0",
+          "number": "0-926-1601"
+        },
+        {
+          "id": "province 14",
+          "number": "14-926-1601"
+        },
+        {
+          "id": "without entry",
+          "number": "8-926"
+        },
+        {
+          "id": "letters in volume",
+          "number": "8-A26-1601"
+        },
+        {
+          "id": "unknown prefix",
+          "number": "XX-5-687"
+        },
+        {
+          "id": "PE with province",
+          "number": "PE-8-5-687"
+        },
+        {
+          "id": "N without entry",
+          "number": "N-19"
+        },
+        {
+          "id": "without separators",
+          "number": "89261601"
+        },
+        {
+          "id": "empty",
+          "number": ""
+        }
+      ],
+      "formats": []
+    },
+    "pa.ruc": {
+      "valid": [
+        {
+          "id": "NT, technical sheet",
+          "number": "8-NT-000-00"
+        },
+        {
+          "id": "PE, technical sheet",
+          "number": "PE-4-000-000"
+        },
+        {
+          "id": "legal entity, technical sheet",
+          "number": "00023824-0930-212623"
+        },
+        {
+          "id": "PE in the middle, CUFE example",
+          "number": "8-PE-3824-523"
+        },
+        {
+          "id": "cédula",
+          "number": "8-926-1601"
+        },
+        {
+          "id": "naturalized cédula",
+          "number": "N-19-473"
+        },
+        {
+          "id": "NT, third-party guide",
+          "number": "3-NT-3-33"
+        },
+        {
+          "id": "legal entity",
+          "number": "155612345-2-2015"
+        }
+      ],
+      "invalid": [
+        {
+          "id": "NT without volume",
+          "number": "8-NT-000"
+        },
+        {
+          "id": "NT with province 14",
+          "number": "14-NT-1-1"
+        },
+        {
+          "id": "two numeric groups",
+          "number": "123-456"
+        },
+        {
+          "id": "too short",
+          "number": "1-1"
+        },
+        {
+          "id": "too long",
+          "number": "12345678901-1234567-12345678"
+        },
+        {
+          "id": "letters only",
+          "number": "ABCDE"
+        },
+        {
+          "id": "empty",
+          "number": ""
+        }
+      ],
+      "formats": []
+    },
+    "mrz.td3": {
+      "valid": [
+        {
+          "id": "ICAO, with line breaks",
+          "number": "P<UTOERIKSSON<<ANNA<MARIA<<<<<<<<<<<<<<<<<<<\nL898902C36UTO7408122F1204159ZE184226B<<<<<10"
+        },
+        {
+          "id": "ICAO, single line",
+          "number": "P<UTOERIKSSON<<ANNA<MARIA<<<<<<<<<<<<<<<<<<<L898902C36UTO7408122F1204159ZE184226B<<<<<10"
+        },
+        {
+          "id": "ICAO, lowercase",
+          "number": "p<utoeriksson<<anna<maria<<<<<<<<<<<<<<<<<<<\nl898902c36uto7408122f1204159ze184226b<<<<<10"
+        },
+        {
+          "id": "unspecified sex",
+          "number": "P<UTOERIKSSON<<ANNA<MARIA<<<<<<<<<<<<<<<<<<<\nL898902C36UTO7408122<1204159ZE184226B<<<<<10"
+        }
+      ],
+      "invalid": [
+        {
+          "id": "empty",
+          "number": ""
+        },
+        {
+          "id": "incomplete lines",
+          "number": "P<UTOERIKSSON<<ANNA<MARIA<<<<<<<<<<<<<<<"
+        },
+        {
+          "id": "document number check digit",
+          "number": "P<UTOERIKSSON<<ANNA<MARIA<<<<<<<<<<<<<<<<<<<\nL898902C37UTO7408122F1204159ZE184226B<<<<<10"
+        },
+        {
+          "id": "birth date check digit",
+          "number": "P<UTOERIKSSON<<ANNA<MARIA<<<<<<<<<<<<<<<<<<<\nL898902C36UTO7408123F1204159ZE184226B<<<<<10"
+        },
+        {
+          "id": "expiry date check digit",
+          "number": "P<UTOERIKSSON<<ANNA<MARIA<<<<<<<<<<<<<<<<<<<\nL898902C36UTO7408122F1204158ZE184226B<<<<<10"
+        },
+        {
+          "id": "optional data check digit",
+          "number": "P<UTOERIKSSON<<ANNA<MARIA<<<<<<<<<<<<<<<<<<<\nL898902C36UTO7408122F1204159ZE184226B<<<<<20"
+        },
+        {
+          "id": "composite check digit",
+          "number": "P<UTOERIKSSON<<ANNA<MARIA<<<<<<<<<<<<<<<<<<<\nL898902C36UTO7408122F1204159ZE184226B<<<<<11"
+        },
+        {
+          "id": "invalid sex",
+          "number": "P<UTOERIKSSON<<ANNA<MARIA<<<<<<<<<<<<<<<<<<<\nL898902C36UTO7408122Q1204159ZE184226B<<<<<10"
+        },
+        {
+          "id": "invalid document code",
+          "number": "I<UTOERIKSSON<<ANNA<MARIA<<<<<<<<<<<<<<<<<<<\nL898902C36UTO7408122F1204159ZE184226B<<<<<10"
+        },
+        {
+          "id": "invalid birth month",
+          "number": "P<UTOERIKSSON<<ANNA<MARIA<<<<<<<<<<<<<<<<<<<\nL898902C36UTO7438122F1204159ZE184226B<<<<<10"
+        }
+      ],
+      "formats": [
+        {
+          "input": "P<UTOERIKSSON<<ANNA<MARIA<<<<<<<<<<<<<<<<<<<L898902C36UTO7408122F1204159ZE184226B<<<<<10",
+          "expected": "P<UTOERIKSSON<<ANNA<MARIA<<<<<<<<<<<<<<<<<<<\nL898902C36UTO7408122F1204159ZE184226B<<<<<10"
+        }
+      ]
+    },
+    "mrz.td1": {
+      "valid": [
+        {
+          "id": "ICAO, with line breaks",
+          "number": "I<UTOD231458907<<<<<<<<<<<<<<<\n7408122F1204159UTO<<<<<<<<<<<6\nERIKSSON<<ANNA<MARIA<<<<<<<<<<"
+        },
+        {
+          "id": "ICAO, single line",
+          "number": "I<UTOD231458907<<<<<<<<<<<<<<<7408122F1204159UTO<<<<<<<<<<<6ERIKSSON<<ANNA<MARIA<<<<<<<<<<"
+        },
+        {
+          "id": "passport card (code P)",
+          "number": "P<UTOD231458907<<<<<<<<<<<<<<<\n7408122F1204159UTO<<<<<<<<<<<6\nERIKSSON<<ANNA<MARIA<<<<<<<<<<"
+        }
+      ],
+      "invalid": [
+        {
+          "id": "empty",
+          "number": ""
+        },
+        {
+          "id": "incomplete lines",
+          "number": "I<UTOD231458907<<<<<<<<<<<<<<<\n7408122F1"
+        },
+        {
+          "id": "document number check digit",
+          "number": "I<UTOD231458908<<<<<<<<<<<<<<<\n7408122F1204159UTO<<<<<<<<<<<6\nERIKSSON<<ANNA<MARIA<<<<<<<<<<"
+        },
+        {
+          "id": "birth date check digit",
+          "number": "I<UTOD231458907<<<<<<<<<<<<<<<\n7408123F1204159UTO<<<<<<<<<<<6\nERIKSSON<<ANNA<MARIA<<<<<<<<<<"
+        },
+        {
+          "id": "expiry date check digit",
+          "number": "I<UTOD231458907<<<<<<<<<<<<<<<\n7408122F1204158UTO<<<<<<<<<<<6\nERIKSSON<<ANNA<MARIA<<<<<<<<<<"
+        },
+        {
+          "id": "composite check digit",
+          "number": "I<UTOD231458907<<<<<<<<<<<<<<<\n7408122F1204159UTO<<<<<<<<<<<7\nERIKSSON<<ANNA<MARIA<<<<<<<<<<"
+        },
+        {
+          "id": "invalid sex",
+          "number": "I<UTOD231458907<<<<<<<<<<<<<<<\n7408122Q1204159UTO<<<<<<<<<<<6\nERIKSSON<<ANNA<MARIA<<<<<<<<<<"
+        },
+        {
+          "id": "invalid birth month",
+          "number": "I<UTOD231458907<<<<<<<<<<<<<<<\n7438122F1204159UTO<<<<<<<<<<<6\nERIKSSON<<ANNA<MARIA<<<<<<<<<<"
+        },
+        {
+          "id": "invalid document code",
+          "number": "Q<UTOD231458907<<<<<<<<<<<<<<<\n7408122F1204159UTO<<<<<<<<<<<6\nERIKSSON<<ANNA<MARIA<<<<<<<<<<"
+        }
+      ],
+      "formats": [
+        {
+          "input": "I<UTOD231458907<<<<<<<<<<<<<<<7408122F1204159UTO<<<<<<<<<<<6ERIKSSON<<ANNA<MARIA<<<<<<<<<<",
+          "expected": "I<UTOD231458907<<<<<<<<<<<<<<<\n7408122F1204159UTO<<<<<<<<<<<6\nERIKSSON<<ANNA<MARIA<<<<<<<<<<"
+        }
+      ]
+    },
+    "mrz.td2": {
+      "valid": [
+        {
+          "id": "ICAO, with line breaks",
+          "number": "I<UTOERIKSSON<<ANNA<MARIA<<<<<<<<<<<\nD231458907UTO7408122F1204159<<<<<<<6"
+        },
+        {
+          "id": "ICAO, single line",
+          "number": "I<UTOERIKSSON<<ANNA<MARIA<<<<<<<<<<<D231458907UTO7408122F1204159<<<<<<<6"
+        }
+      ],
+      "invalid": [
+        {
+          "id": "empty",
+          "number": ""
+        },
+        {
+          "id": "incomplete lines",
+          "number": "I<UTOERIKSSON<<ANNA<MARIA<<<<<<<<<<<\nD23"
+        },
+        {
+          "id": "document number check digit",
+          "number": "I<UTOERIKSSON<<ANNA<MARIA<<<<<<<<<<<\nD231458908UTO7408122F1204159<<<<<<<6"
+        },
+        {
+          "id": "birth date check digit",
+          "number": "I<UTOERIKSSON<<ANNA<MARIA<<<<<<<<<<<\nD231458907UTO7408123F1204159<<<<<<<6"
+        },
+        {
+          "id": "expiry date check digit",
+          "number": "I<UTOERIKSSON<<ANNA<MARIA<<<<<<<<<<<\nD231458907UTO7408122F1204158<<<<<<<6"
+        },
+        {
+          "id": "composite check digit",
+          "number": "I<UTOERIKSSON<<ANNA<MARIA<<<<<<<<<<<\nD231458907UTO7408122F1204159<<<<<<<7"
+        },
+        {
+          "id": "invalid sex",
+          "number": "I<UTOERIKSSON<<ANNA<MARIA<<<<<<<<<<<\nD231458907UTO7408122Q1204159<<<<<<<6"
+        },
+        {
+          "id": "invalid document code",
+          "number": "P<UTOERIKSSON<<ANNA<MARIA<<<<<<<<<<<\nD231458907UTO7408122F1204159<<<<<<<6"
+        }
+      ],
+      "formats": [
+        {
+          "input": "I<UTOERIKSSON<<ANNA<MARIA<<<<<<<<<<<D231458907UTO7408122F1204159<<<<<<<6",
+          "expected": "I<UTOERIKSSON<<ANNA<MARIA<<<<<<<<<<<\nD231458907UTO7408122F1204159<<<<<<<6"
+        }
+      ]
+    }
+  }
+}
