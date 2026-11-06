@@ -47,12 +47,15 @@ def test_fastapi() -> None:
     assert rejected.status_code == 422
     assert rejected.json()["detail"][0]["type"] == "stdnum_checksum"
 
-    assert client.get("/dui/123456784").json() == {"dui": "12345678-4"}
-    assert client.get("/validate", params={"key": "sv.dui", "number": "1"}).json() == {
+    assert client.post("/dui/format", json={"dui": "123456784"}).json() == {"dui": "12345678-4"}
+    assert client.post("/validate", json={"key": "sv.dui", "number": "1"}).json() == {
         "valid": False,
         "error": "format",
     }
-    assert client.get("/validate", params={"key": "xx.none", "number": "1"}).status_code == 404
+    assert client.post("/validate", json={"key": "xx.none", "number": "1"}).status_code == 404
+    swapped = client.post("/validate", json={"key": "12345678-4", "number": "sv.dui"})
+    assert swapped.status_code == 404
+    assert "12345678" not in swapped.text
 
 
 def test_flask() -> None:

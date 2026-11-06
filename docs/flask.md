@@ -52,7 +52,7 @@ class CustomerForm(FlaskForm):
 |-----------|-----|
 | `message` | a single message for any error |
 | `messages` | one message per `ErrorCode` |
-| `normalize` | `"none"` (default), `"compact"` or `"format"`: leaves `field.data` normalized |
+| `normalize` | `"none"` (default), `"canonical"` (the form to store; keeps Panama's hyphens), `"compact"` or `"format"`: leaves `field.data` normalized |
 | document options | e.g. `strict_letter=True` |
 
 Empty fields are not validated: combine `Document` with `DataRequired` or `Optional`. Messages default to English and go through `field.gettext`, so they are translated with your WTForms configuration; use `message=` or `messages=` to override them.
