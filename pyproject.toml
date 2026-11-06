@@ -1,0 +1,173 @@
+[project]
+name = "stdnum-centroamerica"
+version = "0.1.0"
+description = "Validate, format and compact Central American identity and tax numbers"
+readme = "README.md"
+license = "MIT"
+license-files = ["LICENSE"]
+requires-python = ">=3.11"
+authors = [{ name = "Momotombo Devs" }]
+keywords = [
+  "stdnum",
+  "centroamerica",
+  "validation",
+  "nit",
+  "dui",
+  "dpi",
+  "cedula",
+  "ruc",
+  "rtn",
+  "mrz",
+  "guatemala",
+  "el-salvador",
+  "honduras",
+  "nicaragua",
+  "costa-rica",
+  "panama",
+]
+classifiers = [
+  "Development Status :: 4 - Beta",
+  "Intended Audience :: Developers",
+  "Natural Language :: English",
+  "Operating System :: OS Independent",
+  "Programming Language :: Python :: 3 :: Only",
+  "Programming Language :: Python :: 3.11",
+  "Programming Language :: Python :: 3.12",
+  "Programming Language :: Python :: 3.13",
+  "Programming Language :: Python :: 3.14",
+  "Framework :: Django",
+  "Framework :: FastAPI",
+  "Framework :: Flask",
+  "Framework :: Pydantic :: 2",
+  "Topic :: Software Development :: Libraries :: Python Modules",
+  "Typing :: Typed",
+]
+dependencies = []
+
+[project.optional-dependencies]
+pydantic = ["pydantic>=2.6"]
+django = ["Django>=4.2"]
+wtforms = ["WTForms>=3.1"]
+
+[project.urls]
+Homepage = "https://github.com/momotombodevs/stdnum-centroamerica-py"
+Source = "https://github.com/momotombodevs/stdnum-centroamerica-py"
+Issues = "https://github.com/momotombodevs/stdnum-centroamerica-py/issues"
+Changelog = "https://github.com/momotombodevs/stdnum-centroamerica-py/blob/main/CHANGELOG.md"
+
+[dependency-groups]
+dev = [
+  "pytest>=8.3",
+  "pytest-cov>=6.0",
+  "hypothesis>=6.120",
+  "mypy>=1.15",
+  "ruff>=0.9",
+  "pip-audit>=2.7",
+  # integrations (tested in CI)
+  "pydantic>=2.6",
+  "fastapi>=0.115",
+  "httpx>=0.28",
+  "django>=4.2",
+  "django-stubs>=5.1",
+  "flask>=3.1",
+  "wtforms>=3.1",
+  "types-wtforms>=3.1",
+]
+
+[build-system]
+requires = ["uv_build>=0.9.26,<0.10.0"]
+build-backend = "uv_build"
+
+[tool.uv.build-backend]
+module-name = "stdnum_centroamerica"
+source-exclude = [".remember"]
+
+[tool.ruff]
+target-version = "py311"
+line-length = 100
+extend-exclude = [".remember"]
+
+[tool.ruff.format]
+exclude = ["*.md"] # code blocks in the docs are aligned by hand
+
+[tool.ruff.lint]
+select = [
+  "E",
+  "W",
+  "F",
+  "I",
+  "B",
+  "UP",
+  "SIM",
+  "RUF",
+  "N",
+  "S",
+  "PT",
+  "PL",
+  "C4",
+  "PIE",
+  "RET",
+  "TID",
+  "ANN",
+  "BLE",
+  "FBT",
+  "ISC",
+  "T20",
+  "PGH",
+  "PERF",
+]
+ignore = [
+  "PLR2004", # magic numbers: each document's weights and positions are the rule
+  "PLR0911", # early returns in validation read better than nesting
+  "ANN401",  # document options are forwarded as-is (**options: Any)
+]
+
+[tool.ruff.lint.per-file-ignores]
+"tests/**" = [
+  "S101",
+  "ANN",
+  "PLR2004",
+  "FBT",
+  "PLR0913",
+  "S311",
+  "S105",
+  "E501",
+  "PLC0415",
+  "RUF001",
+  "RUF003",  # security tests use deceptive Unicode characters on purpose
+]
+"examples/**" = ["T20", "S104", "S201"]
+
+[tool.ruff.lint.flake8-tidy-imports]
+ban-relative-imports = "all"
+
+[tool.mypy]
+strict = true
+python_version = "3.11"
+files = ["src", "tests", "examples"]
+plugins = ["mypy_django_plugin.main"]
+warn_unreachable = true
+
+[tool.django-stubs]
+django_settings_module = "tests.contrib.django_settings"
+
+[tool.pytest.ini_options]
+addopts = "-ra --strict-markers --strict-config --import-mode=importlib"
+testpaths = ["tests"]
+pythonpath = ["."]
+xfail_strict = true
+filterwarnings = [
+  "error",
+  # Starlette warning about its test client; unrelated to this package.
+  "ignore:Using `httpx` with `starlette.testclient` is deprecated",
+]
+
+[tool.coverage.run]
+branch = true
+source = ["stdnum_centroamerica"]
+
+[tool.coverage.report]
+fail_under = 95
+show_missing = true
+skip_covered = true
+exclude_also = ["if TYPE_CHECKING:", "@overload", "raise NotImplementedError"]
