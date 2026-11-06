@@ -1,6 +1,6 @@
 [project]
 name = "stdnum-centroamerica"
-version = "0.1.0rc1"
+version = "0.1.0"
 description = "Validate, format and compact Central American identity and tax numbers"
 readme = "README.md"
 license = "MIT"
