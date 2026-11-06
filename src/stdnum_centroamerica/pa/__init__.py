@@ -7,7 +7,7 @@ import string
 from dataclasses import dataclass, field
 from enum import StrEnum
 
-from stdnum_centroamerica._base import BaseDocument, ensure_str
+from stdnum_centroamerica._base import DIGITS, BaseDocument, ensure_str
 from stdnum_centroamerica._random import rand_int
 from stdnum_centroamerica._types import ErrorCode
 
@@ -22,8 +22,27 @@ _SEPARATORS = re.compile(r"[ \t\n\r\f\v-]+", re.ASCII)
 _UPPER = str.maketrans(string.ascii_lowercase, string.ascii_uppercase)
 
 
+def _zero_groups(normalized: str) -> bool:
+    """The groups that identify the person are all zeros: ``8-0-0``, ``8-NT-00-0``, ``E-8-0``.
+
+    That is the volume and the entry, or the order number of a foreign resident (``E-P-ORDER``);
+    the province does not identify anyone.
+    """
+    numbers = [group for group in normalized.split("-") if DIGITS.fullmatch(group)]
+    identifying = numbers[-1:] if normalized.startswith("E-") else numbers[-2:]
+    return len(numbers) >= 2 and all(group.strip("0") == "" for group in identifying)
+
+
+def _canonical(number: str) -> str:
+    """Normalized form without leading zeros per group: ``8-0926-01601`` is ``8-926-1601``."""
+    return "-".join(
+        group.lstrip("0") or "0" if DIGITS.fullmatch(group) else group
+        for group in normalize(number).split("-")
+    )
+
+
 def normalize(number: str) -> str:
-    """Upper-case, with a single hyphen between groups: the canonical form of cédula and RUC."""
+    """Upper-case, with a single hyphen between groups: the display form of cédula and RUC."""
     return _SEPARATORS.sub("-", ensure_str(number).strip(_TRIM)).translate(_UPPER)
 
 
@@ -127,21 +146,32 @@ class Cedula(BaseDocument):
     def format(self, number: str) -> str:
         return normalize(number)
 
+    def _is_placeholder(self, prepared: str) -> bool:
+        return _zero_groups(prepared)
+
+    def canonical(self, number: str) -> str:
+        """The normalized form without leading zeros per group (``8-0926-01601`` is
+        ``8-926-1601``). It keeps the hyphens: :meth:`compact` merges different numbers."""
+        return _canonical(number)
+
 
 class Ruc(BaseDocument):
     """RUC (DGI). Level: format, without the check digits.
 
     The DGI e-invoice technical sheet defines the RUC as alphanumeric, 5 to 21 characters,
     with letters and hyphens. The 2-digit DV is assigned by the DGI system and its formula is
-    not published, so it is not validated. As with :class:`Cedula`, the canonical form with
-    hyphens is :meth:`format`.
+    not published, so it is not validated. As with :class:`Cedula`, the display form with
+    hyphens is :meth:`format` and the form to store is :meth:`canonical`.
+
+    A RUC like ``8-1-1`` matches both a natural person's cédula and the legal-entity form; the
+    number alone does not say which.
 
     Accepted forms:
 
     - natural persons: the cédula.
     - foreigners with a PE cédula, as shown in the sheet: ``PE-P-VOLUME-ENTRY``
-      (``PE-4-000-000``) and ``P-PE-VOLUME-ENTRY`` (``8-PE-3824-523``).
-    - Tax Number (foreigners without a cédula): ``P-NT-VOLUME-ENTRY`` (``8-NT-000-00``).
+      (``PE-4-123-456``) and ``P-PE-VOLUME-ENTRY`` (``8-PE-3824-523``).
+    - Tax Number (foreigners without a cédula): ``P-NT-VOLUME-ENTRY`` (``8-NT-123-45``).
     - legal entities: three numeric groups from the Public Registry
       (``00023824-0930-212623``). Permissive group lengths.
     """
@@ -174,3 +204,11 @@ class Ruc(BaseDocument):
 
     def format(self, number: str) -> str:
         return normalize(number)
+
+    def _is_placeholder(self, prepared: str) -> bool:
+        return _zero_groups(prepared)
+
+    def canonical(self, number: str) -> str:
+        """The normalized form without leading zeros per group (``8-0926-01601`` is
+        ``8-926-1601``). It keeps the hyphens: :meth:`compact` merges different numbers."""
+        return _canonical(number)

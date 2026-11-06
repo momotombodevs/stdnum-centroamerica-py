@@ -34,6 +34,11 @@ class Nit(BaseDocument):
     def format(self, number: str) -> str:
         return self._group_last(number)
 
+    def canonical(self, number: str) -> str:
+        """Compact form without leading zeros: they do not change the check digit."""
+        compact = self.compact(number)
+        return compact.lstrip("0") or compact
+
     @staticmethod
     def _check_digit(body: str) -> str:
         """Check digit (``0``-``9`` or ``K``) of the NIT body."""

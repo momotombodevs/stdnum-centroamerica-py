@@ -25,7 +25,7 @@ VALID = {
     "cr.dimex": "155812345678",
     "cr.nite": "1234567890",
     "pa.cedula": "8-926-1601",
-    "pa.ruc": "8-NT-000-00",
+    "pa.ruc": "8-NT-123-45",
     "mrz.td3": "P<UTOERIKSSON<<ANNA<MARIA<<<<<<<<<<<<<<<<<<<L898902C36UTO7408122F1204159ZE184226B<<<<<10",
     "mrz.td1": "I<UTOD231458907<<<<<<<<<<<<<<<7408122F1204159UTO<<<<<<<<<<<6ERIKSSON<<ANNA<MARIA<<<<<<<<<<",
     "mrz.td2": "I<UTOERIKSSON<<ANNA<MARIA<<<<<<<<<<<D231458907UTO7408122F1204159<<<<<<<6",
@@ -163,3 +163,101 @@ def test_shared_documents_are_read_only() -> None:
         shared._strict_letter = True  # type: ignore[attr-defined]
     with pytest.raises(AttributeError, match="immutable"):
         shared.nuevo = 1  # type: ignore[attr-defined]
+
+
+ALL_ZERO = {
+    "gt.nit": ["00", "0000000-0"],
+    "gt.dpi": ["0000000000000"],
+    "sv.dui": ["00000000-0"],
+    "sv.nit": ["0000-000000-000-0", "000000000"],
+    "sv.nrc": ["0", "00000000"],
+    "hn.rtn": ["00000000000000"],
+    "cr.cedula_juridica": ["0-000-000000"],
+    "cr.nite": ["0000000000"],
+    "ni.ruc": ["J0000000000000"],
+    "pa.cedula": ["8-0-0", "PE-0-0", "N-00-000", "E-8-0", "E-8-0000000"],
+    "pa.ruc": ["0-0-0", "8-NT-0-0", "PE-4-0-00", "1-PE-000-0"],
+}
+
+
+@pytest.mark.parametrize(("key", "number"), [(k, n) for k, ns in ALL_ZERO.items() for n in ns])
+def test_all_zero_numbers_are_rejected(key: str, number: str) -> None:
+    assert sca.validate(key, number).error is sca.ErrorCode.COMPONENT
+
+
+def test_zeros_are_fine_when_other_digits_are_not() -> None:
+    assert sca.is_valid("sv.nrc", "10")
+    assert sca.is_valid("pa.cedula", "E-8-10")
+    assert sca.is_valid("pa.cedula", "8-0-1")
+    assert sca.is_valid("pa.cedula", "8-1-0")  # only both volume and entry at zero is a placeholder
+    assert sca.is_valid("gt.nit", "19")
+
+
+def test_random_digits_never_returns_all_zeros(monkeypatch: pytest.MonkeyPatch) -> None:
+    # Forces the first draws to zero: generate() must retry instead of returning "000...".
+    from stdnum_centroamerica import _random
+
+    real = _random.rand_int
+    calls = iter(range(60))
+    monkeypatch.setattr(
+        _random, "rand_int", lambda low, high: low if next(calls, 99) < 40 else real(low, high)
+    )
+    assert _random.random_digits(5).strip("0")
+    assert _random.random_digits(0) == ""
+
+
+def test_unknown_key_shaped_like_a_number_is_not_echoed() -> None:
+    for key in (
+        "12345678-4",
+        "0801-1990-12345",
+        "x" * 100_000,
+        "gt.dpi " + "1234567890101",
+        "12345678.9",
+        "0614.2907861023",
+        "gt.12345678901",
+    ):
+        with pytest.raises(sca.UnknownDocumentError) as error:
+            sca.is_valid(key, "1")
+        assert key not in str(error.value)
+        assert len(str(error.value)) < 200
+
+
+def test_unknown_key_shaped_like_a_key_is_echoed() -> None:
+    with pytest.raises(sca.UnknownDocumentError, match=r"'gt\.dpx'"):
+        sca.is_valid("gt.dpx", "1")
+
+
+def test_panama_canonical_form_keeps_different_numbers_apart() -> None:
+    from stdnum_centroamerica import gt, pa
+
+    cedula = pa.Cedula()
+    assert cedula.compact("1-12-345") == cedula.compact("11-2-345")  # why canonical exists
+    assert cedula.canonical("1-12-345") == "1-12-345"
+    assert cedula.canonical(" 11 2 345 ") == "11-2-345"
+    assert pa.Ruc().canonical("8 nt 1 23") == "8-NT-1-23"
+    assert gt.Dpi().canonical("1234 56789 0101") == "1234567890101"
+
+
+@pytest.mark.parametrize(
+    ("key", "variants", "canonical"),
+    [
+        ("pa.cedula", ["8-926-1601", "8-0926-01601", " 8 926 1601 "], "8-926-1601"),
+        ("pa.cedula", ["8-pi-1-1", "8-PI-01-001"], "8-PI-1-1"),
+        ("pa.ruc", ["00023824-0930-212623", "23824-930-212623"], "23824-930-212623"),
+        ("gt.nit", ["0454505566", "45450556-6"], "454505566"),
+        ("sv.nrc", ["06", "6"], "6"),
+        ("sv.dui", ["12345678-4", "123456784"], "123456784"),
+    ],
+)
+def test_canonical_joins_variants_of_the_same_number(
+    key: str, variants: list[str], canonical: str
+) -> None:
+    for variant in variants:
+        assert sca.is_valid(key, variant), variant
+        assert sca.canonical(key, variant) == canonical
+
+
+def test_canonical_never_merges_different_numbers() -> None:
+    numbers = ["1-12-345", "11-2-345", "1-1-2345", "PE-1-12", "N-1-12", "E-1-12", "1-PI-1-12"]
+    assert all(sca.is_valid("pa.cedula", number) for number in numbers)
+    assert len({sca.canonical("pa.cedula", number) for number in numbers}) == len(numbers)

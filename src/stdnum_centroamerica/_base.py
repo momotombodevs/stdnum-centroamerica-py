@@ -44,6 +44,12 @@ def _rebuild(cls: type[BaseDocument], options: dict[str, Any]) -> BaseDocument:
     return cls(**options)
 
 
+def _all_zero(prepared: str) -> bool:
+    """Return ``True`` if the number has digits and every one of them is ``0``."""
+    digits = [char for char in prepared if char in string.digits]
+    return bool(digits) and all(char == "0" for char in digits)
+
+
 def weighted_sum(digits: str, weights: Iterable[int]) -> int:
     """Sum of each digit times its weight, left to right (one weight per digit)."""
     return sum(int(digits[i]) * weight for i, weight in enumerate(weights))
@@ -114,13 +120,26 @@ class BaseDocument:
         """Return the display form. Without a grouping of its own, it is the compact form."""
         return self.compact(number)
 
+    def canonical(self, number: str) -> str:
+        """Return the form to store: the compact form, unless it loses information.
+
+        Two different valid numbers never share a canonical form, and variants of the same
+        number do. Panama overrides it, because its hyphens are part of the number; documents
+        whose leading zeros carry no meaning (``gt.nit``, ``sv.nrc``) drop them.
+        """
+        return self.compact(number)
+
     # -- validation --------------------------------------------------------------------
 
     def _error(self, number: str) -> ErrorCode | None:
         number = ensure_str(number)
         if len(number) > MAX_INPUT_LENGTH or not number.isascii():
             return ErrorCode.FORMAT
-        return self._check(self._prepare(number))
+        prepared = self._prepare(number)
+        error = self._check(prepared)
+        if error is None and self._is_placeholder(prepared):
+            return ErrorCode.COMPONENT
+        return error
 
     def _validated(self, number: str) -> str | None:
         """Return the validated form of the number, or ``None``: the basis of ``parse()``."""
@@ -142,6 +161,10 @@ class BaseDocument:
     def _check_content(self, prepared: str) -> ErrorCode | None:
         """Additional rules for a number that already matches ``_PATTERN``."""
         return None
+
+    def _is_placeholder(self, prepared: str) -> bool:
+        """``True`` for a valid-looking placeholder: every digit is zero (``00000000-0``)."""
+        return _all_zero(prepared)
 
     # -- formatting --------------------------------------------------------------------
 

@@ -92,7 +92,7 @@ def test_configuration_errors() -> None:
         Document("xx.none")
     with pytest.raises(ValueError, match="normalize"):
         Document("gt.dpi", normalize="other")  # type: ignore[arg-type]
-    assert repr(Document("GT.DPI")) == "Document('gt.dpi', normalize='compact')"
+    assert repr(Document("GT.DPI")) == "Document('gt.dpi', normalize='canonical')"
 
 
 def test_fastapi_responds_422() -> None:
@@ -121,3 +121,33 @@ def test_fastapi_responds_422() -> None:
 
     assert client.get("/dui/123456784").json() == {"dui": "12345678-4"}
     assert client.get("/dui/123456785").status_code == 422
+
+
+def test_default_canonical_keeps_panama_numbers_apart() -> None:
+    adapter = TypeAdapter(Annotated[str, Document("pa.cedula")])
+    assert adapter.validate_python("1-12-345") == "1-12-345"
+    assert adapter.validate_python("11 2 345") == "11-2-345"
+    compact = TypeAdapter(Annotated[str, Document("pa.cedula", normalize="compact")])
+    assert compact.validate_python("1-12-345") == "112345"  # explicit choice is respected
+
+
+@pytest.mark.usefixtures("clean_registry")
+def test_canonical_falls_back_to_compact_for_registered_documents() -> None:
+    import stdnum_centroamerica as sca
+
+    class Plain:
+        def is_valid(self, number: str) -> bool:
+            return True
+
+        def validate(self, number: str) -> sca.ValidationResult:
+            return sca.ValidationResult()
+
+        def format(self, number: str) -> str:
+            return number
+
+        def compact(self, number: str) -> str:
+            return number.replace("-", "")
+
+    sca.register("xx.plain", Plain)
+    adapter = TypeAdapter(Annotated[str, Document("xx.plain")])
+    assert adapter.validate_python("1-2") == "12"

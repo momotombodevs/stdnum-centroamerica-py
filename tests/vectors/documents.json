@@ -17,24 +17,41 @@
         {
           "id": "12345678-9",
           "number": "12345678-9"
+        },
+        {
+          "id": "12 characters: 11-digit body, the longest",
+          "number": "123456789016"
+        },
+        {
+          "id": "check digit K",
+          "number": "1000002-K"
         }
       ],
       "invalid": [
         {
           "id": "1234567-8",
-          "number": "1234567-8"
+          "number": "1234567-8",
+          "error": "checksum"
         },
         {
-          "id": "1234567",
-          "number": "1234567"
+          "id": "1234567: 7 is not the check digit of 123456",
+          "number": "1234567",
+          "error": "checksum"
         },
         {
           "id": "ABC",
-          "number": "ABC"
+          "number": "ABC",
+          "error": "format"
         },
         {
           "id": "",
-          "number": ""
+          "number": "",
+          "error": "format"
+        },
+        {
+          "id": "13 characters: 12-digit body is too long",
+          "number": "1234567890120",
+          "error": "format"
         }
       ],
       "formats": [
@@ -58,19 +75,23 @@
       "invalid": [
         {
           "id": "1234567880101",
-          "number": "1234567880101"
+          "number": "1234567880101",
+          "error": "checksum"
         },
         {
           "id": "1234567890001",
-          "number": "1234567890001"
+          "number": "1234567890001",
+          "error": "component"
         },
         {
           "id": "1234567892301",
-          "number": "1234567892301"
+          "number": "1234567892301",
+          "error": "component"
         },
         {
           "id": "123",
-          "number": "123"
+          "number": "123",
+          "error": "format"
         }
       ],
       "formats": [
@@ -94,15 +115,18 @@
       "invalid": [
         {
           "id": "12345678-5",
-          "number": "12345678-5"
+          "number": "12345678-5",
+          "error": "checksum"
         },
         {
           "id": "1234567",
-          "number": "1234567"
+          "number": "1234567",
+          "error": "format"
         },
         {
           "id": "ABCDEFGH-4",
-          "number": "ABCDEFGH-4"
+          "number": "ABCDEFGH-4",
+          "error": "format"
         }
       ],
       "formats": [
@@ -133,36 +157,60 @@
         {
           "id": "DUI as NIT (9 digits)",
           "number": "12345678-4"
+        },
+        {
+          "id": "sequence 100: last one with the current formula",
+          "number": "06141313861007"
+        },
+        {
+          "id": "sequence 101: first one with the legacy formula",
+          "number": "06141313861010"
+        },
+        {
+          "id": "remainder 10 becomes check digit 0",
+          "number": "06141313920050"
         }
       ],
       "invalid": [
         {
           "id": "wrong check digit",
-          "number": "0614-130386-136-5"
+          "number": "0614-130386-136-5",
+          "error": "checksum"
         },
         {
           "id": "wrong check digit, legacy formula",
-          "number": "0716-200261-001-5"
+          "number": "0716-200261-001-5",
+          "error": "checksum"
         },
         {
           "id": "placeholder from the guide",
-          "number": "10101010101010"
+          "number": "10101010101010",
+          "error": "checksum"
         },
         {
           "id": "DUI with wrong check digit",
-          "number": "12345678-5"
+          "number": "12345678-5",
+          "error": "checksum"
         },
         {
           "id": "too short",
-          "number": "0614-130386-136"
+          "number": "0614-130386-136",
+          "error": "format"
         },
         {
           "id": "letters",
-          "number": "0614-130386-136-A"
+          "number": "0614-130386-136-A",
+          "error": "format"
         },
         {
           "id": "empty",
-          "number": ""
+          "number": "",
+          "error": "format"
+        },
+        {
+          "id": "sequence 101 with the current formula's check digit",
+          "number": "06141313861019",
+          "error": "checksum"
         }
       ],
       "formats": [
@@ -202,19 +250,23 @@
       "invalid": [
         {
           "id": "123456789",
-          "number": "123456789"
+          "number": "123456789",
+          "error": "format"
         },
         {
           "id": "12A456",
-          "number": "12A456"
+          "number": "12A456",
+          "error": "format"
         },
         {
           "id": "ABC",
-          "number": "ABC"
+          "number": "ABC",
+          "error": "format"
         },
         {
           "id": "",
-          "number": ""
+          "number": "",
+          "error": "format"
         }
       ],
       "formats": [
@@ -262,47 +314,58 @@
       "invalid": [
         {
           "id": "department 00",
-          "number": "0001-1990-12345"
+          "number": "0001-1990-12345",
+          "error": "component"
         },
         {
           "id": "department 19",
-          "number": "1901-1990-12345"
+          "number": "1901-1990-12345",
+          "error": "component"
         },
         {
           "id": "municipality 00",
-          "number": "0800-1990-12345"
+          "number": "0800-1990-12345",
+          "error": "component"
         },
         {
           "id": "municipality 29 of Francisco Morazán",
-          "number": "0829-1990-12345"
+          "number": "0829-1990-12345",
+          "error": "component"
         },
         {
           "id": "Gracias a Dios has only 6",
-          "number": "0907-1990-00001"
+          "number": "0907-1990-00001",
+          "error": "component"
         },
         {
           "id": "Intibucá has only 17",
-          "number": "1018-1990-00001"
+          "number": "1018-1990-00001",
+          "error": "component"
         },
         {
           "id": "code 0881 is not special",
-          "number": "0881-1990-12345"
+          "number": "0881-1990-12345",
+          "error": "component"
         },
         {
           "id": "future year",
-          "number": "0801-2999-12345"
+          "number": "0801-2999-12345",
+          "error": "component"
         },
         {
           "id": "year 1700",
-          "number": "0801-1700-12345"
+          "number": "0801-1700-12345",
+          "error": "component"
         },
         {
           "id": "too short",
-          "number": "0801-1990-1234"
+          "number": "0801-1990-1234",
+          "error": "format"
         },
         {
           "id": "letters",
-          "number": "0801-1990-1234A"
+          "number": "0801-1990-1234A",
+          "error": "format"
         }
       ],
       "formats": []
@@ -321,11 +384,13 @@
       "invalid": [
         {
           "id": "0801-1990-12345",
-          "number": "0801-1990-12345"
+          "number": "0801-1990-12345",
+          "error": "format"
         },
         {
           "id": "0801-1990-12345A",
-          "number": "0801-1990-12345A"
+          "number": "0801-1990-12345A",
+          "error": "format"
         }
       ],
       "formats": [
@@ -356,32 +421,46 @@
         {
           "id": "6010101900001X",
           "number": "6010101900001X"
+        },
+        {
+          "id": "municipality 640, the last of the range",
+          "number": "640-010190-0001A"
+        },
+        {
+          "id": "born abroad, code 888",
+          "number": "888-010190-0001A"
         }
       ],
       "invalid": [
         {
           "id": "month 13",
-          "number": "001-011390-0001N"
+          "number": "001-011390-0001N",
+          "error": "component"
         },
         {
           "id": "day 32",
-          "number": "001-320190-0001N"
+          "number": "001-320190-0001N",
+          "error": "component"
         },
         {
           "id": "municipality 000",
-          "number": "000-010190-0001V"
+          "number": "000-010190-0001V",
+          "error": "component"
         },
         {
           "id": "municipality out of range",
-          "number": "641-010190-0001T"
+          "number": "641-010190-0001T",
+          "error": "component"
         },
         {
           "id": "without letter",
-          "number": "001-010190-0001"
+          "number": "001-010190-0001",
+          "error": "format"
         },
         {
           "id": "too short",
-          "number": "123"
+          "number": "123",
+          "error": "format"
         }
       ],
       "formats": []
@@ -420,19 +499,23 @@
       "invalid": [
         {
           "id": "K0310000000001",
-          "number": "K0310000000001"
+          "number": "K0310000000001",
+          "error": "format"
         },
         {
           "id": "J031000000000",
-          "number": "J031000000000"
+          "number": "J031000000000",
+          "error": "format"
         },
         {
           "id": "123",
-          "number": "123"
+          "number": "123",
+          "error": "format"
         },
         {
           "id": "four leading zeros (DGI)",
-          "number": "0000300766011M"
+          "number": "0000300766011M",
+          "error": "component"
         }
       ],
       "formats": []
@@ -451,15 +534,18 @@
       "invalid": [
         {
           "id": "0-0123-0456",
-          "number": "0-0123-0456"
+          "number": "0-0123-0456",
+          "error": "format"
         },
         {
           "id": "1-0123-045",
-          "number": "1-0123-045"
+          "number": "1-0123-045",
+          "error": "format"
         },
         {
           "id": "A-0123-0456",
-          "number": "A-0123-0456"
+          "number": "A-0123-0456",
+          "error": "format"
         }
       ],
       "formats": [
@@ -487,15 +573,18 @@
       "invalid": [
         {
           "id": "3-101-12345",
-          "number": "3-101-12345"
+          "number": "3-101-12345",
+          "error": "format"
         },
         {
           "id": "3-101-1234567",
-          "number": "3-101-1234567"
+          "number": "3-101-1234567",
+          "error": "format"
         },
         {
           "id": "3-101-12345A",
-          "number": "3-101-12345A"
+          "number": "3-101-12345A",
+          "error": "format"
         }
       ],
       "formats": [
@@ -519,15 +608,18 @@
       "invalid": [
         {
           "id": "055812345678",
-          "number": "055812345678"
+          "number": "055812345678",
+          "error": "format"
         },
         {
           "id": "1558123456",
-          "number": "1558123456"
+          "number": "1558123456",
+          "error": "format"
         },
         {
           "id": "1558123456789",
-          "number": "1558123456789"
+          "number": "1558123456789",
+          "error": "format"
         }
       ],
       "formats": [
@@ -547,15 +639,18 @@
       "invalid": [
         {
           "id": "123456789",
-          "number": "123456789"
+          "number": "123456789",
+          "error": "format"
         },
         {
           "id": "12345678901",
-          "number": "12345678901"
+          "number": "12345678901",
+          "error": "format"
         },
         {
           "id": "ABCDEFGHIJ",
-          "number": "ABCDEFGHIJ"
+          "number": "ABCDEFGHIJ",
+          "error": "format"
         }
       ],
       "formats": [
@@ -606,58 +701,99 @@
         {
           "id": "predates the civil registry",
           "number": "8-AV-12-345"
+        },
+        {
+          "id": "province 13 (third-party sources)",
+          "number": "13-1-1"
+        },
+        {
+          "id": "six-digit volume and entry, the longest",
+          "number": "8-123456-123456"
+        },
+        {
+          "id": "foreign resident, seven-digit order, the longest",
+          "number": "E-8-1234567"
+        },
+        {
+          "id": "PE, six-digit volume",
+          "number": "PE-123456-1"
+        },
+        {
+          "id": "N, six-digit entry",
+          "number": "N-1-123456"
         }
       ],
       "invalid": [
         {
           "id": "province 0",
-          "number": "0-926-1601"
+          "number": "0-926-1601",
+          "error": "format"
         },
         {
           "id": "province 14",
-          "number": "14-926-1601"
+          "number": "14-926-1601",
+          "error": "format"
         },
         {
           "id": "without entry",
-          "number": "8-926"
+          "number": "8-926",
+          "error": "format"
         },
         {
           "id": "letters in volume",
-          "number": "8-A26-1601"
+          "number": "8-A26-1601",
+          "error": "format"
         },
         {
           "id": "unknown prefix",
-          "number": "XX-5-687"
+          "number": "XX-5-687",
+          "error": "format"
         },
         {
           "id": "PE with province",
-          "number": "PE-8-5-687"
+          "number": "PE-8-5-687",
+          "error": "format"
         },
         {
           "id": "N without entry",
-          "number": "N-19"
+          "number": "N-19",
+          "error": "format"
         },
         {
           "id": "without separators",
-          "number": "89261601"
+          "number": "89261601",
+          "error": "format"
         },
         {
           "id": "empty",
-          "number": ""
+          "number": "",
+          "error": "format"
+        },
+        {
+          "id": "seven-digit volume",
+          "number": "8-1234567-1",
+          "error": "format"
+        },
+        {
+          "id": "seven-digit entry",
+          "number": "8-1-1234567",
+          "error": "format"
+        },
+        {
+          "id": "foreign resident, eight-digit order",
+          "number": "E-8-12345678",
+          "error": "format"
+        },
+        {
+          "id": "PE, seven-digit volume",
+          "number": "PE-1234567-1",
+          "error": "format"
         }
       ],
       "formats": []
     },
     "pa.ruc": {
       "valid": [
-        {
-          "id": "NT, technical sheet",
-          "number": "8-NT-000-00"
-        },
-        {
-          "id": "PE, technical sheet",
-          "number": "PE-4-000-000"
-        },
         {
           "id": "legal entity, technical sheet",
           "number": "00023824-0930-212623"
@@ -685,32 +821,49 @@
       ],
       "invalid": [
         {
+          "id": "NT, technical sheet template, all zeros",
+          "number": "8-NT-000-00",
+          "error": "component"
+        },
+        {
+          "id": "PE, technical sheet template, all zeros",
+          "number": "PE-4-000-000",
+          "error": "component"
+        },
+        {
           "id": "NT without volume",
-          "number": "8-NT-000"
+          "number": "8-NT-000",
+          "error": "format"
         },
         {
           "id": "NT with province 14",
-          "number": "14-NT-1-1"
+          "number": "14-NT-1-1",
+          "error": "format"
         },
         {
           "id": "two numeric groups",
-          "number": "123-456"
+          "number": "123-456",
+          "error": "format"
         },
         {
           "id": "too short",
-          "number": "1-1"
+          "number": "1-1",
+          "error": "format"
         },
         {
           "id": "too long",
-          "number": "12345678901-1234567-12345678"
+          "number": "12345678901-1234567-12345678",
+          "error": "format"
         },
         {
           "id": "letters only",
-          "number": "ABCDE"
+          "number": "ABCDE",
+          "error": "format"
         },
         {
           "id": "empty",
-          "number": ""
+          "number": "",
+          "error": "format"
         }
       ],
       "formats": []
@@ -737,43 +890,53 @@
       "invalid": [
         {
           "id": "empty",
-          "number": ""
+          "number": "",
+          "error": "format"
         },
         {
           "id": "incomplete lines",
-          "number": "P<UTOERIKSSON<<ANNA<MARIA<<<<<<<<<<<<<<<"
+          "number": "P<UTOERIKSSON<<ANNA<MARIA<<<<<<<<<<<<<<<",
+          "error": "format"
         },
         {
           "id": "document number check digit",
-          "number": "P<UTOERIKSSON<<ANNA<MARIA<<<<<<<<<<<<<<<<<<<\nL898902C37UTO7408122F1204159ZE184226B<<<<<10"
+          "number": "P<UTOERIKSSON<<ANNA<MARIA<<<<<<<<<<<<<<<<<<<\nL898902C37UTO7408122F1204159ZE184226B<<<<<10",
+          "error": "checksum"
         },
         {
           "id": "birth date check digit",
-          "number": "P<UTOERIKSSON<<ANNA<MARIA<<<<<<<<<<<<<<<<<<<\nL898902C36UTO7408123F1204159ZE184226B<<<<<10"
+          "number": "P<UTOERIKSSON<<ANNA<MARIA<<<<<<<<<<<<<<<<<<<\nL898902C36UTO7408123F1204159ZE184226B<<<<<10",
+          "error": "checksum"
         },
         {
           "id": "expiry date check digit",
-          "number": "P<UTOERIKSSON<<ANNA<MARIA<<<<<<<<<<<<<<<<<<<\nL898902C36UTO7408122F1204158ZE184226B<<<<<10"
+          "number": "P<UTOERIKSSON<<ANNA<MARIA<<<<<<<<<<<<<<<<<<<\nL898902C36UTO7408122F1204158ZE184226B<<<<<10",
+          "error": "checksum"
         },
         {
           "id": "optional data check digit",
-          "number": "P<UTOERIKSSON<<ANNA<MARIA<<<<<<<<<<<<<<<<<<<\nL898902C36UTO7408122F1204159ZE184226B<<<<<20"
+          "number": "P<UTOERIKSSON<<ANNA<MARIA<<<<<<<<<<<<<<<<<<<\nL898902C36UTO7408122F1204159ZE184226B<<<<<20",
+          "error": "checksum"
         },
         {
           "id": "composite check digit",
-          "number": "P<UTOERIKSSON<<ANNA<MARIA<<<<<<<<<<<<<<<<<<<\nL898902C36UTO7408122F1204159ZE184226B<<<<<11"
+          "number": "P<UTOERIKSSON<<ANNA<MARIA<<<<<<<<<<<<<<<<<<<\nL898902C36UTO7408122F1204159ZE184226B<<<<<11",
+          "error": "checksum"
         },
         {
           "id": "invalid sex",
-          "number": "P<UTOERIKSSON<<ANNA<MARIA<<<<<<<<<<<<<<<<<<<\nL898902C36UTO7408122Q1204159ZE184226B<<<<<10"
+          "number": "P<UTOERIKSSON<<ANNA<MARIA<<<<<<<<<<<<<<<<<<<\nL898902C36UTO7408122Q1204159ZE184226B<<<<<10",
+          "error": "component"
         },
         {
           "id": "invalid document code",
-          "number": "I<UTOERIKSSON<<ANNA<MARIA<<<<<<<<<<<<<<<<<<<\nL898902C36UTO7408122F1204159ZE184226B<<<<<10"
+          "number": "I<UTOERIKSSON<<ANNA<MARIA<<<<<<<<<<<<<<<<<<<\nL898902C36UTO7408122F1204159ZE184226B<<<<<10",
+          "error": "component"
         },
         {
           "id": "invalid birth month",
-          "number": "P<UTOERIKSSON<<ANNA<MARIA<<<<<<<<<<<<<<<<<<<\nL898902C36UTO7438122F1204159ZE184226B<<<<<10"
+          "number": "P<UTOERIKSSON<<ANNA<MARIA<<<<<<<<<<<<<<<<<<<\nL898902C36UTO7438122F1204159ZE184226B<<<<<10",
+          "error": "component"
         }
       ],
       "formats": [
@@ -801,39 +964,48 @@
       "invalid": [
         {
           "id": "empty",
-          "number": ""
+          "number": "",
+          "error": "format"
         },
         {
           "id": "incomplete lines",
-          "number": "I<UTOD231458907<<<<<<<<<<<<<<<\n7408122F1"
+          "number": "I<UTOD231458907<<<<<<<<<<<<<<<\n7408122F1",
+          "error": "format"
         },
         {
           "id": "document number check digit",
-          "number": "I<UTOD231458908<<<<<<<<<<<<<<<\n7408122F1204159UTO<<<<<<<<<<<6\nERIKSSON<<ANNA<MARIA<<<<<<<<<<"
+          "number": "I<UTOD231458908<<<<<<<<<<<<<<<\n7408122F1204159UTO<<<<<<<<<<<6\nERIKSSON<<ANNA<MARIA<<<<<<<<<<",
+          "error": "checksum"
         },
         {
           "id": "birth date check digit",
-          "number": "I<UTOD231458907<<<<<<<<<<<<<<<\n7408123F1204159UTO<<<<<<<<<<<6\nERIKSSON<<ANNA<MARIA<<<<<<<<<<"
+          "number": "I<UTOD231458907<<<<<<<<<<<<<<<\n7408123F1204159UTO<<<<<<<<<<<6\nERIKSSON<<ANNA<MARIA<<<<<<<<<<",
+          "error": "checksum"
         },
         {
           "id": "expiry date check digit",
-          "number": "I<UTOD231458907<<<<<<<<<<<<<<<\n7408122F1204158UTO<<<<<<<<<<<6\nERIKSSON<<ANNA<MARIA<<<<<<<<<<"
+          "number": "I<UTOD231458907<<<<<<<<<<<<<<<\n7408122F1204158UTO<<<<<<<<<<<6\nERIKSSON<<ANNA<MARIA<<<<<<<<<<",
+          "error": "checksum"
         },
         {
           "id": "composite check digit",
-          "number": "I<UTOD231458907<<<<<<<<<<<<<<<\n7408122F1204159UTO<<<<<<<<<<<7\nERIKSSON<<ANNA<MARIA<<<<<<<<<<"
+          "number": "I<UTOD231458907<<<<<<<<<<<<<<<\n7408122F1204159UTO<<<<<<<<<<<7\nERIKSSON<<ANNA<MARIA<<<<<<<<<<",
+          "error": "checksum"
         },
         {
           "id": "invalid sex",
-          "number": "I<UTOD231458907<<<<<<<<<<<<<<<\n7408122Q1204159UTO<<<<<<<<<<<6\nERIKSSON<<ANNA<MARIA<<<<<<<<<<"
+          "number": "I<UTOD231458907<<<<<<<<<<<<<<<\n7408122Q1204159UTO<<<<<<<<<<<6\nERIKSSON<<ANNA<MARIA<<<<<<<<<<",
+          "error": "component"
         },
         {
           "id": "invalid birth month",
-          "number": "I<UTOD231458907<<<<<<<<<<<<<<<\n7438122F1204159UTO<<<<<<<<<<<6\nERIKSSON<<ANNA<MARIA<<<<<<<<<<"
+          "number": "I<UTOD231458907<<<<<<<<<<<<<<<\n7438122F1204159UTO<<<<<<<<<<<6\nERIKSSON<<ANNA<MARIA<<<<<<<<<<",
+          "error": "component"
         },
         {
           "id": "invalid document code",
-          "number": "Q<UTOD231458907<<<<<<<<<<<<<<<\n7408122F1204159UTO<<<<<<<<<<<6\nERIKSSON<<ANNA<MARIA<<<<<<<<<<"
+          "number": "Q<UTOD231458907<<<<<<<<<<<<<<<\n7408122F1204159UTO<<<<<<<<<<<6\nERIKSSON<<ANNA<MARIA<<<<<<<<<<",
+          "error": "component"
         }
       ],
       "formats": [
@@ -857,35 +1029,43 @@
       "invalid": [
         {
           "id": "empty",
-          "number": ""
+          "number": "",
+          "error": "format"
         },
         {
           "id": "incomplete lines",
-          "number": "I<UTOERIKSSON<<ANNA<MARIA<<<<<<<<<<<\nD23"
+          "number": "I<UTOERIKSSON<<ANNA<MARIA<<<<<<<<<<<\nD23",
+          "error": "format"
         },
         {
           "id": "document number check digit",
-          "number": "I<UTOERIKSSON<<ANNA<MARIA<<<<<<<<<<<\nD231458908UTO7408122F1204159<<<<<<<6"
+          "number": "I<UTOERIKSSON<<ANNA<MARIA<<<<<<<<<<<\nD231458908UTO7408122F1204159<<<<<<<6",
+          "error": "checksum"
         },
         {
           "id": "birth date check digit",
-          "number": "I<UTOERIKSSON<<ANNA<MARIA<<<<<<<<<<<\nD231458907UTO7408123F1204159<<<<<<<6"
+          "number": "I<UTOERIKSSON<<ANNA<MARIA<<<<<<<<<<<\nD231458907UTO7408123F1204159<<<<<<<6",
+          "error": "checksum"
         },
         {
           "id": "expiry date check digit",
-          "number": "I<UTOERIKSSON<<ANNA<MARIA<<<<<<<<<<<\nD231458907UTO7408122F1204158<<<<<<<6"
+          "number": "I<UTOERIKSSON<<ANNA<MARIA<<<<<<<<<<<\nD231458907UTO7408122F1204158<<<<<<<6",
+          "error": "checksum"
         },
         {
           "id": "composite check digit",
-          "number": "I<UTOERIKSSON<<ANNA<MARIA<<<<<<<<<<<\nD231458907UTO7408122F1204159<<<<<<<7"
+          "number": "I<UTOERIKSSON<<ANNA<MARIA<<<<<<<<<<<\nD231458907UTO7408122F1204159<<<<<<<7",
+          "error": "checksum"
         },
         {
           "id": "invalid sex",
-          "number": "I<UTOERIKSSON<<ANNA<MARIA<<<<<<<<<<<\nD231458907UTO7408122Q1204159<<<<<<<6"
+          "number": "I<UTOERIKSSON<<ANNA<MARIA<<<<<<<<<<<\nD231458907UTO7408122Q1204159<<<<<<<6",
+          "error": "component"
         },
         {
           "id": "invalid document code",
-          "number": "P<UTOERIKSSON<<ANNA<MARIA<<<<<<<<<<<\nD231458907UTO7408122F1204159<<<<<<<6"
+          "number": "P<UTOERIKSSON<<ANNA<MARIA<<<<<<<<<<<\nD231458907UTO7408122F1204159<<<<<<<6",
+          "error": "component"
         }
       ],
       "formats": [

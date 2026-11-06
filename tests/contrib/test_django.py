@@ -77,7 +77,7 @@ def test_validator_serializes_in_migrations() -> None:
 
 class CustomerForm(forms.Form):
     dpi = DocumentFormField("gt.dpi")
-    cedula_pa = DocumentFormField("pa.cedula", normalize="format", required=False)
+    cedula_pa = DocumentFormField("pa.cedula", required=False)
     cedula_ni = DocumentFormField(
         "ni.cedula", normalize="none", document_options={"strict_letter": True}, required=False
     )
