@@ -24,5 +24,15 @@ def choice(items: Sequence[T]) -> T:
 
 
 def random_digits(length: int, *, non_zero_first: bool = False) -> str:
-    """Return ``length`` random digits; ``non_zero_first`` avoids a leading zero."""
-    return "".join(str(rand_int(1 if i == 0 and non_zero_first else 0, 9)) for i in range(length))
+    """Return ``length`` random digits, never all zeros; ``non_zero_first`` avoids a leading zero.
+
+    All zeros is rejected by validation, so it is never generated.
+    """
+    if length < 1:
+        return ""
+    while True:
+        digits = "".join(
+            str(rand_int(1 if i == 0 and non_zero_first else 0, 9)) for i in range(length)
+        )
+        if digits.strip("0"):
+            return digits

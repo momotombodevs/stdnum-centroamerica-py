@@ -20,6 +20,19 @@ class TestCedula:
     def test_letter_is_computed_modulo_23(self) -> None:
         assert Cedula.check_letter("0012510750012") == "S"
 
+    @pytest.mark.parametrize("remainder", range(23))
+    def test_every_letter_of_the_table(self, remainder: int) -> None:
+        # Table from the open-source formula, typed here rather than imported: swapping two
+        # letters in the package must fail. I, O, U and Z are not used.
+        table = "ABCDEFGHJKLMNPQRSTUVWXY"
+        base = 10101900000  # 001-010190-0000 without its leading zeros
+        sequence = next(n for n in range(23) if (base + n) % 23 == remainder)
+        digits = f"{base + sequence:013d}"
+        assert Cedula.check_letter(digits) == table[remainder]
+        assert Cedula(strict_letter=True).is_valid(digits + table[remainder])
+        wrong = table[(remainder + 1) % 23]
+        assert Cedula(strict_letter=True).validate(digits + wrong).error is ErrorCode.CHECKSUM
+
     @pytest.mark.parametrize("digits", ["", "12A", "١٢٣", "1_000", " 12"])
     def test_check_letter_requires_ascii_digits(self, digits: str) -> None:
         with pytest.raises(ValueError, match="ASCII digits"):
@@ -62,7 +75,8 @@ class TestCedula:
         doc = Cedula()
         ruc = Ruc()
         letters = string.ascii_uppercase
-        for municipality in [*range(1, MAX_CODE + 1), 888]:
+        assert MAX_CODE == 640  # 16 blocks of 40 codes; typed here, not imported
+        for municipality in [*range(1, 641), 888]:
             number = (
                 f"{municipality:03d}150690000{municipality % 10}"
                 f"{letters[municipality % len(letters)]}"

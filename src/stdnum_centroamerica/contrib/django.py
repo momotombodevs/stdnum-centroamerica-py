@@ -28,7 +28,12 @@ from typing import TYPE_CHECKING, Any
 
 from stdnum_centroamerica._registry import make
 from stdnum_centroamerica._types import ErrorCode
-from stdnum_centroamerica.contrib._common import Normalize, check_normalize, missing_dependency
+from stdnum_centroamerica.contrib._common import (
+    Normalize,
+    check_normalize,
+    missing_dependency,
+    normalized,
+)
 
 try:
     from django import forms
@@ -97,8 +102,9 @@ class DocumentFormField(forms.CharField):
     """Form field that validates the document and returns the normalized number.
 
     :param key: document key.
-    :param normalize: ``"compact"`` (default), ``"format"`` or ``"none"``. For Panama use
-        ``"format"``: the hyphens are part of the number.
+    :param normalize: ``"canonical"`` (default: the form to store, compact except for
+        Panama, whose hyphens are part of the number), ``"compact"``, ``"format"`` or
+        ``"none"``.
     :param document_options: document options, e.g. ``{"strict_letter": True}``.
     :param kwargs: ``CharField`` arguments (``required``, ``label``, ...).
     """
@@ -107,7 +113,7 @@ class DocumentFormField(forms.CharField):
         self,
         key: str,
         *,
-        normalize: Normalize = "compact",
+        normalize: Normalize = "canonical",
         document_options: Mapping[str, Any] | None = None,
         **kwargs: Any,
     ) -> None:
@@ -122,8 +128,6 @@ class DocumentFormField(forms.CharField):
 
     def clean(self, value: Any) -> Any:
         cleaned = super().clean(value)
-        if cleaned in self.empty_values or self.normalize == "none":
+        if cleaned in self.empty_values:
             return cleaned
-        if self.normalize == "compact":
-            return self._document.compact(cleaned)
-        return self._document.format(cleaned)
+        return normalized(self._document, cleaned, self.normalize)

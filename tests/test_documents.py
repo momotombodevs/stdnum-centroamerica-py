@@ -26,6 +26,11 @@ def _formats() -> list[object]:
 
 VALID = _cases("valid")
 INVALID = _cases("invalid")
+INVALID_WITH_ERROR = [
+    pytest.param(key, case["number"], case["error"], id=f"{key}: {case['id']!r}")
+    for key, entry in VECTORS.items()
+    for case in entry["invalid"]
+]
 
 
 def test_every_document_has_vectors() -> None:
@@ -50,11 +55,12 @@ def test_validate_reports_no_error_for_valid_numbers(key: str, number: str) -> N
     assert result
 
 
-@pytest.mark.parametrize(("key", "number"), INVALID)
-def test_validate_reports_an_error_for_invalid_numbers(key: str, number: str) -> None:
+@pytest.mark.parametrize(("key", "number", "error"), INVALID_WITH_ERROR)
+def test_validate_reports_the_expected_error(key: str, number: str, error: str) -> None:
+    # The reason matters: a vector meant to test a component must not pass on its checksum.
     result = sca.validate(key, number)
     assert not result.is_valid
-    assert isinstance(result.error, sca.ErrorCode)
+    assert result.error is sca.ErrorCode(error)
     assert not result
 
 

@@ -15,12 +15,12 @@ from stdnum_centroamerica.contrib.pydantic import Document
 Dpi = Annotated[str, Document("gt.dpi")]                                  # "1234567890101"
 Dui = Annotated[str, Document("sv.dui", normalize="format")]              # "12345678-4"
 CedulaNi = Annotated[str, Document("ni.cedula", normalize="format", strict_letter=True)]
-CedulaPa = Annotated[str, Document("pa.cedula", normalize="format")]      # Panama: always "format"
+CedulaPa = Annotated[str, Document("pa.cedula")]                          # "8-926-1601": keeps the hyphens
 ```
 
 | Parameter | Values | Default |
 |-----------|--------|---------|
-| `normalize` | `"compact"` (for storage), `"format"` (for display), `"none"` (unchanged) | `"compact"` |
+| `normalize` | `"canonical"` (for storage: compact, except Panama, which keeps its hyphens), `"compact"` (always strips separators), `"format"` (for display), `"none"` (unchanged) | `"canonical"` |
 | `messages` | `{ErrorCode.CHECKSUM: "...", ...}` to translate or customize messages | English messages |
 | document options | e.g. `strict_letter=True` | the document's defaults |
 
@@ -30,9 +30,11 @@ The key is checked when the module is imported: a misspelled key fails at startu
 
 ```python
 from fastapi import FastAPI
-from pydantic import BaseModel
+from pydantic import BaseModel, ConfigDict
 
 class Customer(BaseModel):
+    model_config = ConfigDict(hide_input_in_errors=True)   # see "Errors" below
+
     name: str
     dpi: Dpi
     cedula: CedulaNi | None = None
@@ -41,12 +43,10 @@ app = FastAPI()
 
 @app.post("/customers", status_code=201)
 def create_customer(customer: Customer) -> Customer:
-    return customer                      # customer.dpi is already compact
-
-@app.get("/dui/{dui}")
-def get_dui(dui: Dui) -> dict[str, str]:
-    return {"dui": dui}
+    return customer                      # customer.dpi is already in canonical form
 ```
+
+Send document numbers in the request body, not in the path or the query string (`/dui/{dui}`, `?number=`): URLs end up in access logs, proxy logs, browser history and `Referer` headers.
 
 ## Errors
 
@@ -82,7 +82,7 @@ from stdnum_centroamerica import ErrorCode
 Dpi = Annotated[str, Document("gt.dpi", messages={ErrorCode.CHECKSUM: "El dígito de control no coincide."})]
 ```
 
-> The `input` field of the 422 response contains the submitted number, which is personal data. If you log validation errors, remove `input` before writing the log.
+> The `input` field of the 422 response contains the submitted number, which is personal data, and so does `str()` of the Pydantic `ValidationError` (`input_value=...`). Set `model_config = ConfigDict(hide_input_in_errors=True)` on models that hold document numbers so `str()` leaves it out, and remove `input` from 422 responses before logging them.
 
 ## Generic validation
 
@@ -90,15 +90,24 @@ For an endpoint that validates any document (for example, for a dynamic form), u
 
 ```python
 import stdnum_centroamerica as sca
-from fastapi import HTTPException, Query
+from fastapi import HTTPException
+from pydantic import Field
 
-@app.get("/validate")
-def validate(key: str, number: Annotated[str, Query(max_length=sca.MAX_INPUT_LENGTH)]) -> dict[str, object]:
+class ValidateIn(BaseModel):
+    model_config = ConfigDict(hide_input_in_errors=True)
+
+    key: str = Field(max_length=64)
+    number: str = Field(max_length=sca.MAX_INPUT_LENGTH)
+
+@app.post("/validate")
+def validate(body: ValidateIn) -> dict[str, object]:
     try:
-        result = sca.validate(key, number)
+        result = sca.validate(body.key, body.number)
     except sca.UnknownDocumentError as error:
         raise HTTPException(status_code=404, detail=str(error)) from error
     return {"valid": result.is_valid, "error": result.error}
 ```
+
+`UnknownDocumentError` only echoes keys shaped like `country.document`; anything else (for example a number passed as the key by mistake) is left out of the message.
 
 Complete, tested example: [examples/fastapi_app.py](../examples/fastapi_app.py).

@@ -16,6 +16,7 @@ dependencies, performs no I/O and never stores or logs the numbers.
 
 from stdnum_centroamerica._base import MAX_INPUT_LENGTH, BaseDocument
 from stdnum_centroamerica._registry import (
+    canonical,
     describe,
     generate,
     is_valid,
@@ -40,7 +41,7 @@ from stdnum_centroamerica.exceptions import (
     UnsupportedOperationError,
 )
 
-__version__ = "0.1.0"
+__version__ = "0.2.0"
 
 __all__ = [
     "MAX_INPUT_LENGTH",
@@ -56,6 +57,7 @@ __all__ = [
     "UnsupportedOperationError",
     "ValidationResult",
     "__version__",
+    "canonical",
     "describe",
     "generate",
     "is_valid",

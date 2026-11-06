@@ -220,7 +220,7 @@ class _BaseMrz(BaseDocument):
             birth_date=None if fields.birth == _UNKNOWN_DATE else fields.birth,
             sex=None if fields.sex == "<" else fields.sex,
             expiry_date=None if fields.expiry == _UNKNOWN_DATE else fields.expiry,
-            optional_data=fields.optional.rstrip("<"),
+            optional_data=fields.optional.strip("<"),  # TD1: line 1 may be empty filler
         )
 
     def format(self, number: str) -> str:
@@ -234,6 +234,9 @@ class _BaseMrz(BaseDocument):
     def _check_content(self, prepared: str) -> ErrorCode | None:
         fields = self._fields(prepared)
         return self._check_components(fields) or self._check_digits(fields)
+
+    def _is_placeholder(self, prepared: str) -> bool:
+        return False  # names and codes are letters: zeros alone never make an empty MRZ
 
     def _check_components(self, f: _Fields) -> ErrorCode | None:
         valid = (

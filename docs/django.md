@@ -33,28 +33,29 @@ from django import forms
 from stdnum_centroamerica.contrib.django import DocumentFormField
 
 class CustomerForm(forms.Form):
-    dpi = DocumentFormField("gt.dpi")                                     # compact
-    cedula_pa = DocumentFormField("pa.cedula", normalize="format", required=False)
+    dpi = DocumentFormField("gt.dpi")                                     # canonical: compact
+    cedula_pa = DocumentFormField("pa.cedula", required=False)            # canonical: keeps hyphens
     cedula_ni = DocumentFormField(
         "ni.cedula", normalize="format", document_options={"strict_letter": True}, required=False
     )
 ```
 
-It accepts the `CharField` arguments (`label`, `required`, `help_text`, ...). Document options go in `document_options` so they do not clash with those.
+`normalize` is `"canonical"` by default: the form to store, which is the compact form except in Panama, whose hyphens are part of the number (`compact()` would turn `1-12-345` and `11-2-345` into the same `112345`). The other values are `"compact"`, `"format"` (for display) and `"none"`.
 
-In a `ModelForm`, use `DocumentValidator` on the model and normalize in `clean_<field>`:
+It accepts the `CharField` arguments (`label`, `required`, `help_text`, ...). Document options go in `document_options` so they do not clash with those. `max_length` defaults to 128, so formatted input with spaces or hyphens fits.
+
+`DocumentValidator` only validates; it never changes the value. In a `ModelForm`, declare the field with `DocumentFormField` so it normalizes before saving:
 
 ```python
-import stdnum_centroamerica as sca
-
 class CustomerModelForm(forms.ModelForm):
+    dpi = DocumentFormField("gt.dpi")   # accepts "1234 56789 0101", saves "1234567890101"
+
     class Meta:
         model = Customer
         fields = ["dpi"]
-
-    def clean_dpi(self) -> str:
-        return sca.make("gt.dpi").compact(self.cleaned_data["dpi"])
 ```
+
+Without that declaration, Django builds the form field from the model, with `max_length=13`, and rejects `"1234 56789 0101"` (15 characters) before any `clean_dpi()` can compact it.
 
 ## Django REST Framework
 
@@ -69,10 +70,10 @@ class CustomerSerializer(serializers.Serializer):
     dpi = serializers.CharField(max_length=32, validators=[DocumentValidator("gt.dpi")])
 
     def validate_dpi(self, value: str) -> str:
-        return sca.make("gt.dpi").compact(value)    # store it normalized
+        return sca.canonical("gt.dpi", value)    # store it normalized
 ```
 
-For Panama, use `format()` instead of `compact()`, because the hyphens are part of the number.
+`sca.canonical()` is the form to store for every document: variants of the same number share it and different numbers never do. For Panama it keeps the hyphens, which `compact()` would remove.
 
 ## Messages and translation
 

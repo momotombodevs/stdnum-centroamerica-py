@@ -2,8 +2,8 @@
 
 [![ci](https://github.com/momotombodevs/stdnum-centroamerica-py/actions/workflows/ci.yml/badge.svg)](https://github.com/momotombodevs/stdnum-centroamerica-py/actions/workflows/ci.yml)
 [![PyPI](https://img.shields.io/pypi/v/stdnum-centroamerica)](https://pypi.org/project/stdnum-centroamerica/)
-[![Python](https://img.shields.io/pypi/pyversions/stdnum-centroamerica)](pyproject.toml)
-[![License](https://img.shields.io/pypi/l/stdnum-centroamerica)](LICENSE)
+[![Python](https://img.shields.io/pypi/pyversions/stdnum-centroamerica)](https://github.com/momotombodevs/stdnum-centroamerica-py/blob/main/pyproject.toml)
+[![License](https://img.shields.io/pypi/l/stdnum-centroamerica)](https://github.com/momotombodevs/stdnum-centroamerica-py/blob/main/LICENSE)
 
 Validate, format and compact Central American identity and tax document numbers: DPI, NIT, DUI, NRC, RTN, cédulas, RUC, DIMEX and passport MRZs. No dependencies, fully typed, Python 3.11 or later. Works in any project: scripts, FastAPI, Flask, Django, DRF, Celery or notebooks.
 
@@ -27,7 +27,7 @@ python -m pip install stdnum-centroamerica
 python -m pip install "stdnum-centroamerica[django]"
 ```
 
-More options (Poetry, PDM, installing from GitHub, editable mode, hashes) in [docs/installation.md](docs/installation.md).
+More options (Poetry, PDM, installing from GitHub, editable mode, hashes) in [docs/installation.md](https://github.com/momotombodevs/stdnum-centroamerica-py/blob/main/docs/installation.md).
 
 ## Usage
 
@@ -129,7 +129,7 @@ True
 
 The number does not encode the century, so `birth_year_candidates()` returns the possible years (it may be empty: 29/02/01 exists neither in 1901 nor in 2001). For the same reason it cannot be used to decide legal age: someone born in 2010 also gets the candidate 1910.
 
-Components come from the structure of the number and are not checked against any registry. **Birth dates and the other components are personal data**: they are hidden from `repr()` so they do not end up in a log by accident, but treat them accordingly (see [docs/security.md](docs/security.md)).
+Components come from the structure of the number and are not checked against any registry. **Birth dates and the other components are personal data**: they are hidden from `repr()` so they do not end up in a log by accident, but treat them accordingly (see [docs/security.md](https://github.com/momotombodevs/stdnum-centroamerica-py/blob/main/docs/security.md)).
 
 ### Test data
 
@@ -167,7 +167,7 @@ An unknown key raises `UnknownDocumentError` (with suggestions when it resembles
 | El Salvador | NRC | `sv.nrc` | format |
 | Honduras | Número de identidad | `hn.identidad` | format (valid department and municipality) |
 | Honduras | RTN | `hn.rtn` | format |
-| Nicaragua | Cédula | `ni.cedula` | complete (check letter with `strict_letter`, off by default) |
+| Nicaragua | Cédula | `ni.cedula` | format (complete with `strict_letter=True`: the check letter is off by default) |
 | Nicaragua | RUC | `ni.ruc` | format |
 | Costa Rica | Cédula física | `cr.cedula_fisica` | format |
 | Costa Rica | Cédula jurídica | `cr.cedula_juridica` | format |
@@ -181,24 +181,25 @@ An unknown key raises `UnknownDocumentError` (with suggestions when it resembles
 
 Notes:
 
-- **Panama:** volume and entry have variable length, so the number can only be read with its hyphens. Use `format()` for the canonical form (`8-926-1601`); `compact()` removes the hyphens.
+- **Panama:** volume and entry have variable length, so the number can only be read with its hyphens: `compact()` turns both `1-12-345` and `11-2-345` into `112345`. Store `sca.canonical(key, number)`, which keeps them (`8-926-1601`) and drops leading zeros (`8-0926-01601` is the same number).
+- **All zeros:** a number whose digits are all zero (`00000000-0`, `00`) is rejected with `COMPONENT`: it is a placeholder, even when its check digit adds up.
 - **Honduras:** `hn.identidad` accepts the special codes for naturalized citizens (`0890`) and dual nationality (`0880`).
 - **MRZ:** accepted with or without line breaks. Dates stay as `YYMMDD`, because the century cannot be inferred. Country-specific passport numbers are not validated, only the MRZ.
 - **Nicaragua:** the municipality codes and the check letter come from third parties (the CSE does not publish them), and code 888 has a single source. In Panama, provinces 10 to 13 and the PI and AV suffixes are not official either.
-- The source of every rule, with the date it was consulted, is in [docs/sources.md](docs/sources.md).
+- The source of every rule, with the date it was consulted, is in [docs/sources.md](https://github.com/momotombodevs/stdnum-centroamerica-py/blob/main/docs/sources.md).
 
 ## Framework integrations
 
 The core works in any project with no configuration. The integrations are optional and report errors in each framework's own format. Their messages default to English and can be overridden (see each guide).
 
-**FastAPI / Pydantic v2** ([guide](docs/fastapi.md)):
+**FastAPI / Pydantic v2** ([guide](https://github.com/momotombodevs/stdnum-centroamerica-py/blob/main/docs/fastapi.md)):
 
 ```python
 from typing import Annotated
 from pydantic import BaseModel
 from stdnum_centroamerica.contrib.pydantic import Document
 
-Dpi = Annotated[str, Document("gt.dpi")]  # validates and stores it compact
+Dpi = Annotated[str, Document("gt.dpi")]  # validates and returns the canonical form to store
 
 class Customer(BaseModel):
     dpi: Dpi
@@ -206,7 +207,7 @@ class Customer(BaseModel):
 # When invalid, FastAPI responds with 422 and type="stdnum_checksum" (or format / component).
 ```
 
-**Django and DRF** ([guide](docs/django.md)):
+**Django and DRF** ([guide](https://github.com/momotombodevs/stdnum-centroamerica-py/blob/main/docs/django.md)):
 
 ```python
 from stdnum_centroamerica.contrib.django import DocumentFormField, DocumentValidator
@@ -215,10 +216,10 @@ class Customer(models.Model):
     dpi = models.CharField(max_length=13, validators=[DocumentValidator("gt.dpi")])
 
 class CustomerForm(forms.Form):
-    dpi = DocumentFormField("gt.dpi")  # cleaned_data["dpi"] is compact
+    dpi = DocumentFormField("gt.dpi")  # cleaned_data["dpi"] is the canonical form (compact)
 ```
 
-**Flask** ([guide](docs/flask.md)):
+**Flask** ([guide](https://github.com/momotombodevs/stdnum-centroamerica-py/blob/main/docs/flask.md)):
 
 ```python
 from stdnum_centroamerica.contrib.wtforms import Document
@@ -227,16 +228,16 @@ class CustomerForm(FlaskForm):
     dpi = StringField("DPI", validators=[DataRequired(), Document("gt.dpi")])
 ```
 
-Complete, tested examples in [examples/](examples/).
+Complete, tested examples in [examples/](https://github.com/momotombodevs/stdnum-centroamerica-py/tree/main/examples).
 
 ## Security
 
 - No dependencies, no network access and no I/O: the package never stores or logs numbers.
-- Only `str` inputs of up to 256 ASCII characters are accepted; anything else is a `FORMAT` error and no regular expression runs. This rejects digits from other scripts, Unicode hyphens and invisible spaces.
+- Only `str` inputs are accepted: any other type raises `TypeError`. Inputs longer than 256 characters or with non-ASCII characters are a `FORMAT` error before any regular expression runs. This rejects digits from other scripts, Unicode hyphens and invisible spaces.
 - Regular expressions run in linear time (no catastrophic backtracking), and the tests check this with adversarial inputs.
 - Instances and data tables are immutable, so they can be shared between threads.
 
-Details and recommendations for integrators in [docs/security.md](docs/security.md). To report a vulnerability, see [SECURITY.md](SECURITY.md).
+Details and recommendations for integrators in [docs/security.md](https://github.com/momotombodevs/stdnum-centroamerica-py/blob/main/docs/security.md). To report a vulnerability, see [SECURITY.md](https://github.com/momotombodevs/stdnum-centroamerica-py/blob/main/SECURITY.md).
 
 ## Development
 
@@ -247,7 +248,7 @@ uv run ruff check . && uv run ruff format --check .
 uv run mypy                      # strict mode
 ```
 
-See [CONTRIBUTING.md](CONTRIBUTING.md) for the branching model and how to add a document.
+See [CONTRIBUTING.md](https://github.com/momotombodevs/stdnum-centroamerica-py/blob/main/CONTRIBUTING.md) for the branching model and how to add a document.
 
 ## License
 

@@ -166,3 +166,112 @@ def test_sex_x_and_unspecified() -> None:
     data = Td3().parse(TD3.replace("7408122F", "7408122<"))
     assert data is not None
     assert data.sex is None
+
+
+# -- MRZs built field by field, with check digits computed here (ICAO 9303, part 3) -------
+
+
+def _cd(value: str) -> str:
+    """Independent ICAO check digit, so a wrong weight or value in the package fails."""
+    values = {**{str(d): d for d in range(10)}, **{chr(65 + i): 10 + i for i in range(26)}}
+    total = sum(values.get(char, 0) * (7, 3, 1)[i % 3] for i, char in enumerate(value))
+    return str(total % 10)
+
+
+def _td3(
+    *,
+    code: str = "P<",
+    issuer: str = "UTO",
+    nationality: str = "UTO",
+    birth: str = "740812",
+    sex: str = "F",
+    expiry: str = "120415",
+    optional: str = "ZE184226B<<<<<",
+    optional_check: str | None = None,
+) -> str:
+    number = "L898902C3"
+    if optional_check is None:
+        optional_check = _cd(optional)
+    head = f"{number}{_cd(number)}{nationality}{birth}{_cd(birth)}{sex}"
+    tail = f"{expiry}{_cd(expiry)}{optional}{optional_check}"
+    line2 = head + tail
+    composite = _cd(line2[0:10] + line2[13:20] + line2[21:43])
+    return f"{code}{issuer}{'ERIKSSON<<ANNA<MARIA':<<44}"[:44] + "\n" + line2 + composite
+
+
+def _td1(*, code: str = "I<", optional2: str = "<<<<<<<<<<<", composite: str | None = None) -> str:
+    number = "D23145890"
+    line1 = f"{code}UTO{number}{_cd(number)}{'':<<15}"
+    line2 = f"7408122F1204159UTO{optional2}"
+    if composite is None:
+        composite = _cd(line1[5:30] + line2[0:7] + line2[8:15] + line2[18:29])
+    return f"{line1}\n{line2}{composite}\n{'ERIKSSON<<ANNA<MARIA':<<30}"
+
+
+def _td2(*, code: str = "I<") -> str:
+    number = "D23145890"
+    line2 = f"{number}{_cd(number)}UTO7408122F1204159<<<<<<<"
+    composite = _cd(line2[0:10] + line2[13:20] + line2[21:35])
+    return f"{code}UTO{'ERIKSSON<<ANNA<MARIA':<<31}\n{line2}{composite}"
+
+
+def test_builders_reproduce_the_icao_samples() -> None:
+    assert _td3() == TD3
+    assert _td1() == TD1
+    assert _td2() == TD2
+
+
+@pytest.mark.parametrize(
+    ("mrz", "error"),
+    [
+        pytest.param(_td3(issuer="U1O"), ErrorCode.COMPONENT, id="digit in the issuer"),
+        pytest.param(_td3(nationality="U1O"), ErrorCode.COMPONENT, id="digit in the nationality"),
+        pytest.param(_td3(code="P1"), ErrorCode.COMPONENT, id="digit in the document code"),
+        pytest.param(_td3(expiry="121315"), ErrorCode.COMPONENT, id="expiry month 13"),
+        pytest.param(_td3(birth="740832"), ErrorCode.COMPONENT, id="birth day 32"),
+        pytest.param(_td3(sex="Q"), ErrorCode.COMPONENT, id="sex Q"),
+        pytest.param(
+            _td3(optional="<" * 14, optional_check="1"), ErrorCode.CHECKSUM, id="empty optional, 1"
+        ),
+        pytest.param(_td3(birth="000229"), None, id="29 February 2000"),
+        pytest.param(_td3(birth="<<<<<<"), None, id="unknown birth date"),
+        pytest.param(_td3(optional="<" * 14, optional_check="0"), None, id="empty optional, 0"),
+        pytest.param(_td3(optional="<" * 14, optional_check="<"), None, id="empty optional, <"),
+        pytest.param(_td3(sex="X"), None, id="sex X"),
+    ],
+)
+def test_td3_components_with_correct_check_digits(mrz: str, error: ErrorCode | None) -> None:
+    # Every check digit is right, so a COMPONENT error can only come from the component rule.
+    assert Td3().validate(mrz).error is error
+
+
+@pytest.mark.parametrize("code", ["A<", "C<", "I<", "AC", "IR"])
+def test_td1_and_td2_document_codes(code: str) -> None:
+    assert Td1().is_valid(_td1(code=code))
+    assert Td2().is_valid(_td2(code=code))
+
+
+def test_td1_and_td2_reject_other_document_codes() -> None:
+    assert Td1().validate(_td1(code="V<")).error is ErrorCode.COMPONENT
+    assert Td2().validate(_td2(code="P<")).error is ErrorCode.COMPONENT
+
+
+def test_td1_composite_covers_the_optional_data_of_line_two() -> None:
+    filled = _td1(optional2="AB123<<<<<<")
+    assert Td1().is_valid(filled)
+    data = Td1().parse(filled)
+    assert data is not None
+    assert data.optional_data == "AB123"
+    stale = _td1(optional2="AB123<<<<<<", composite=_td1()[59])
+    assert Td1().validate(stale).error is ErrorCode.CHECKSUM
+
+
+def test_td1_long_number_marker_without_continuation_is_a_checksum_error() -> None:
+    # "<" in the check digit position announces a number longer than nine characters; with no
+    # continuation in the optional data there is no check digit at all, whatever the number.
+    number = next(f"D2314589{d}" for d in "0123456789" if _cd(f"D2314589{d}") == "0")
+    line1 = f"I<UTO{number}<{'':<<15}"
+    line2 = "7408122F1204159UTO<<<<<<<<<<<"
+    composite = _cd(line1[5:30] + line2[0:7] + line2[8:15] + line2[18:29])
+    mrz = f"{line1}\n{line2}{composite}\n{'ERIKSSON<<ANNA<MARIA':<<30}"
+    assert Td1().validate(mrz).error is ErrorCode.CHECKSUM

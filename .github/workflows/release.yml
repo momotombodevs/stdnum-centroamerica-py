@@ -17,22 +17,36 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
-  build:
-    name: build and check
+  test:
+    name: test the tagged commit
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           persist-credentials: false
       - uses: astral-sh/setup-uv@68559e99cc807c1eb7e9238fd43a15bba460eec2 # v10.3.3
+      - run: uv sync --locked
+      - run: uv run pytest
+
+  # Builds in a job of its own: the dev dependencies that the tests install never run next
+  # to the files that get published.
+  build:
+    name: build and check
+    needs: test
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: astral-sh/setup-uv@68559e99cc807c1eb7e9238fd43a15bba460eec2 # v10.3.3
+        with:
+          enable-cache: false # nothing cached by other workflows reaches the published files
       - name: Tag matches the package version
         env:
           TAG: ${{ github.ref_name }}
         run: test "v$(uv version --short)" = "$TAG"
-      - run: uv sync --locked
-      - run: uv run pytest
-      - run: uv build
-      - run: uvx twine check --strict dist/*
+      - run: uv build --no-sources
+      - run: uvx twine@7.0.0 check --strict dist/*
       - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
           name: dist

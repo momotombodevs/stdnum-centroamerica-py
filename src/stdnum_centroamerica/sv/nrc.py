@@ -24,5 +24,10 @@ class Nrc(BaseDocument):
     def format(self, number: str) -> str:
         return self._group_last(number)
 
+    def canonical(self, number: str) -> str:
+        """Compact form without leading zeros: ``06`` and ``6`` are the same NRC."""
+        compact = self.compact(number)
+        return compact.lstrip("0") or compact
+
     def generate(self) -> str:
         return random_digits(rand_int(1, 8))

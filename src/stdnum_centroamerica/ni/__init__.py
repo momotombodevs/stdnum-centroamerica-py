@@ -73,7 +73,7 @@ class CedulaData:
 
 
 class Cedula(BaseDocument):
-    """Identity card (CSE), ``000-000000-0000A``. Level: complete.
+    """Identity card (CSE), ``000-000000-0000A``. Level: format (complete with ``strict_letter``).
 
     Municipality (3) + birth date DDMMYY (6) + sequence number (4) + letter. Law 152, art. 31,
     defines the 13 digits; it does not mention the letter.
