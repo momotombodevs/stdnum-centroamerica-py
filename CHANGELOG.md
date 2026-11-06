@@ -4,6 +4,8 @@ All notable changes to this project are documented in this file. The format is b
 
 ## [Unreleased]
 
+## [0.2.0] - 2026-11-06
+
 ### Added
 - `sca.canonical(key, number)` and `canonical()` on every bundled document: the form to store. Variants of the same number share it and different numbers never do. It is the compact form, except in Panama, where it keeps the hyphens; Panama, `gt.nit` and `sv.nrc` also drop leading zeros (`8-0926-01601` is `8-926-1601`).
 - `normalize="canonical"` in the Pydantic, Django and WTForms integrations.
@@ -38,3 +40,7 @@ Initial release.
 - Optional integrations: `contrib.pydantic.Document` (FastAPI, Pydantic v2), `contrib.django.DocumentValidator` and `DocumentFormField` (Django, DRF) and `contrib.wtforms.Document` (Flask-WTF), with the `[pydantic]`, `[django]` and `[wtforms]` extras.
 - Security: input limited to 256 ASCII characters, linear regular expressions used with `fullmatch`, immutable instances, and numbers are never logged.
 - Full type hints (`py.typed`), `mypy --strict`, ruff, Hypothesis property tests and tested examples in `examples/`.
+
+[Unreleased]: https://github.com/momotombodevs/stdnum-centroamerica-py/compare/v0.2.0...HEAD
+[0.2.0]: https://github.com/momotombodevs/stdnum-centroamerica-py/compare/v0.1.0...v0.2.0
+[0.1.0]: https://github.com/momotombodevs/stdnum-centroamerica-py/releases/tag/v0.1.0
